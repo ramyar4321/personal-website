@@ -1,0 +1,34 @@
+body {
+    background: yellow;
+    margin: 0;
+    padding: 0;
+}
+
+div.welcome {
+    background: black;
+    padding: 10px 10px;
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+    height: 400px;
+}
+
+div h1 {
+    font-weight: bold;
+    color: rgb(235, 226, 226);
+    font-size: 200px;
+}
+
+footer {
+    background: blue;
+    height: 200px;
+    padding: 5px;
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+}
+
+
+div p {
+    color: rgb(235, 226, 226);
+}

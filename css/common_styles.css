@@ -1,0 +1,30 @@
+header {
+    background: white;
+    height: 100px;
+    padding: 5px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+nav {
+    color: black;
+}
+
+nav ul {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+}
+
+nav li {
+    padding: 0px 10px 0px 10px;
+}
+
+header a {
+    text-decoration: none;
+}
+
+header a:hover {
+    text-decoration: line-through
+}
