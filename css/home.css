@@ -25,10 +25,3 @@
     font-size: 20px;
     color: white;
 }
-
-.contact {
-    margin: auto 0;
-    background-color: lightblue;
-    text-decoration: none;
-    flex-grow: 1;
-}
