@@ -33,7 +33,38 @@
     display: flex;
     flex-direction: row;
     background-color: brown;
+    width: 50%;
 }
+
+
+.fallout figure, .darksouls figure, .kotr div{
+    width: 300px;
+    height: 400px;
+    padding: 10px auto 10px auto;
+}
+
+.fallout figure img, .darksouls figure img, .kotr iframe{
+    border: 1px solid white;
+    box-shadow: gray 0 0 10px;
+    width: 300px;
+    height: 400px;
+}
+
+.book-imgs figure {
+    margin: auto;
+    padding: 5px;
+    text-align: center;
+    text-transform: uppercase;
+    width: 300px;
+    height: 400px;
+}
+
+.book-imgs figure img {
+    border: 1px solid white;
+    box-shadow: gray 0 0 10px;
+    width: 300px;
+    height: 400px;
+} 
 
 .books {
     display: flex;
@@ -62,7 +93,7 @@
     box-shadow: gray 0 0 10px;
     width: 300px;
     height: 400px;
-  }
+}
 
 .socializing {
     margin-top: 30px;
