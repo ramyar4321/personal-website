@@ -1,5 +1,4 @@
-.head, .intro, .video-games,.socializing, .fallout div, 
-.darksouls div, .kotr div{
+.head, .intro, .vidya-description, .socializing{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,8 +17,7 @@
     font-size: 30px;
 }
 
-.intro, .video-games, .socializing, .fallout div, .darksouls div,
-.kotr div {
+.intro, .vidya-description, .vidya-visual, .socializing {
     flex-direction: column;
 }
 
@@ -29,26 +27,44 @@
     border-bottom: 1px solid;
 }
 
-.fallout, .darksouls, .kotr {
+.vidya {
     display: flex;
     flex-direction: row;
+}
+
+
+.vidya-description{
     background-color: brown;
     width: 50%;
 }
 
-
-.fallout figure, .darksouls figure, .kotr div{
-    width: 300px;
-    height: 400px;
-    padding: 10px auto 10px auto;
+.vidya-description div{
+    margin: auto;
+    width: 50%;
+    font-size: 150%;
+    font-style: italic;
 }
 
-.fallout figure img, .darksouls figure img, .kotr iframe{
-    border: 1px solid white;
+.vidya-visual {
+    background-color: black;
+    width: 50%
+}
+
+
+.vidya-visual figure, .vidya-visual div{
+    margin: auto;
+    width: 300px;
+    height: 400px;
+}
+
+.vidya-visual figure img, .vidya-visual div iframe{
+    margin: auto;
     box-shadow: gray 0 0 10px;
     width: 300px;
     height: 400px;
 }
+
+
 
 .book-imgs figure {
     margin: auto;
