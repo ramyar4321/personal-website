@@ -1,0 +1,19 @@
+.head, .education{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.education-title{
+    width: 50%;
+    border-top: 2px solid;
+}
+
+
+.education-detail {
+    width: 50%;
+    display: flex;
+    align-items: left;
+    flex-direction: row;
+}
