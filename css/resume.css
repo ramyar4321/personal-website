@@ -1,19 +1,59 @@
-.head, .education{
+.head, .education, .awards-acheivements {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.head {
+    text-align: center;
+}
+
+span {
+    font-weight: bold;
+}
+
+li {
+    list-style-type: none;
+}
+
+.education {
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
-}
-
-.education-title{
-    width: 50%;
-    border-top: 2px solid;
+    margin-bottom: 40px;
 }
 
 
-.education-detail {
-    width: 50%;
+.education-title, .education-detail {
+    text-align: left;
+}
+
+.education-title, .awards-acheivements-title {
+    border-top: 1px solid;
+}
+
+.education-title h2, .education-detail p, .education-diploma p,
+.awards-acheivements-title h2{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.education-diploma p {
+    margin-left: 82px;
+}
+
+.awards-acheivements {
     display: flex;
-    align-items: left;
+    flex-direction: column;
+    margin-bottom: 40px;
+}
+
+.awards-acheivements-content {
+    display: flex;
     flex-direction: row;
+    background-color: blueviolet;
+    margin-top: 0px;
+}
+
+.awards-acheivements .year ul{
+    padding-left: 0px;
 }
