@@ -48,7 +48,10 @@ header a:hover {
 }
 
 .contact {
-    margin: auto 0;
+    /*margin: auto 0;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: lightblue;
     text-decoration: none;
     flex-grow: 1;
