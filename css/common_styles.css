@@ -8,8 +8,8 @@ body {
 }
 
 header {
-    background: white;
-    height: 100px;
+    background:white;
+    height: 50px;
     padding: 5px;
     display: flex;
     justify-content: left;
@@ -17,26 +17,32 @@ header {
 }
 
 
-ul {
+
+.nav ul {
     margin: 0px;
     padding: 0px;
     list-style: none;
 }
 
-ul li {
+.nav ul li {
     float: left;
-    padding: 0px 10px;
-    margin: 0px;
+    margin: 0px 40px;
 }
 
-ul li ul li {
-    padding: 0px;
-    display: none;
-}
-
-ul li:hover ul li {
-    display: block;
+.nav ul li ul {
     position: absolute;
+}
+
+.nav ul li ul li {
+    padding: 0px;
+    float: none;
+    display: none;
+    margin: 5px 0px;
+}
+
+.nav ul li:hover ul li {
+    display: block;
+    /*position: absolute;*/
 }
 
 header a {
