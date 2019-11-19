@@ -36,6 +36,7 @@ ul li ul li {
 
 ul li:hover ul li {
     display: block;
+    position: absolute;
 }
 
 header a {
