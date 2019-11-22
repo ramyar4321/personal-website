@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>My Website</title>
+    <link rel="stylesheet" type="text/css" href="../../css/ode_approx.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common_styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="nav">
+            <ul>
+                <li><a href="../../index.html">Home</a></li>
+                <li><a href="../aboutme.html">About Me</a></li>
+                <li><a href="../resume.html">Resume</a></li>
+                <li>Projects
+                    <ul>
+                        <li><a href="ode_approx.html">ODE Approximation</a></li>
+                        <li><a href="ode_approx.html">ODE Approximation</a></li>
+                        <li><a href="ode_approx.html">ODE Approximation</a></li>
+                        <li><a href="ode_approx.html">ODE Approximation</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </header>
+    <section class="approx-methodes">
+        <div>
+            <p>
+                Use Euler Methode or Runge-Kutta Methode <br>
+                in order to approximate ordinary differential equations of the <br>
+                form f' = f(x,y)</p>
+        </div>
+        <div id="formula">
+            <p>Please enter ODE of the form y' = y(x,y)</p>
+            <input type="text" value="3-2*x-0.5*y">
+        </div>
+        <div id="stepsize">
+            <p>Please enter the step size h: <input type="text" value="0.2"> </p>
+        </div>
+        <div id="initial-conditions">
+            <p>Please enter intial conditions: y(<input id="x" type="text" value="0">) =
+                <input id="y" type="text" value="1">
+            </p>
+        </div>
+        <div id="final-conditions">
+            <p>
+                Find y(<input id="x-final" type="text" value="1">)
+            </p>
+        </div>
+        <div>
+            <p><button id="euler-button">Euler Methode</button> <button id="rungekutta-button">Runge-Kutta Methode</button></p>
+        </div>
+    </section>
+    <section>
+        <code>
+            <pre>
+/*The following is the C source code originally written back in 2015
+to help me with my math course.*/
+
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <math.h>
+
+//#define FILENAME1 "Diff_Equa_Approx1_Question1_ALLdata.txt"//generates a file with columns of time, y_n+1, and that tangent line equation
+#define FILENAME1 "Diff_Equa_Euler_Aprrox_Question1_PLOTdata.txt"//generates a file to plot data of y_n+1 vs time
+#define FILENAME2 "Diff_Equa_Runge_Kutta_approx_Ques1_PLOTdata.txt"
+#define TRUE 1
+#define FALSE 0
+
+void numericalAprroxWithEuler(double euler_h, double t_0, double y_0, double t_final);//y_0 and t_0 are the initial values for the diff equation
+void Runge_KuttaMethode(double euler_h, double t_0, double y_0, double t_final);
+void Choose_numberical_methode(void);
+int doAgain(void);
+
+int main(void){
+	Choose_numberical_methode();
+
+	system("PAUSE");
+	return 0;
+
+}
+/*-----------------------------------------*/
+//This function prompts the user to choose numerical methods.
+void Choose_numberical_methode(void){
+	do
+	{//declare and initialize variables
+		double h, t_intial, t_final, y_initial, choose;
+
+		//prompt the user for actual parameters of the numericalAprrox function
+		printf("Please enter the step size h: ");
+		scanf("%lf", &h);
+		printf("\nPlease enter the initial values t0 and y0, in that order: ");
+		scanf("%lf %lf", &t_intial, &y_initial);
+		printf("Enter the end t or x or independent variable: ");
+		scanf("%lf", &t_final);
+
+		//prompt the user to either choose euler's method or RungeKutta Methode
+		printf("Enter 0 for Euler's method or 1 for Runge-Kutta method or 2 for generating two files for both methods: ");
+		scanf("%lf", &choose);
+		if (choose == 0)
+			numericalAprroxWithEuler(h, t_intial, y_initial, t_final);
+		else
+		{
+			if (choose == 1)
+				Runge_KuttaMethode(h, t_intial, y_initial, t_final);
+			else
+			{
+				numericalAprroxWithEuler(h, t_intial, y_initial, t_final);
+				Runge_KuttaMethode(h, t_intial, y_initial, t_final);
+			}
+		}
+	} while (doAgain());
+}
+
+/*----------------------------------------------------------------------------------*/
+/*This functions using Euler's method to produce the approximation for the plot*/
+
+void numericalAprroxWithEuler(double euler_h, double t_0, double y_0, double t_final){
+	//declare and initialize variables
+	double f_prime, t, y;
+	FILE *plot_data;//only shows y vs t or x
+
+	plot_data = fopen(FILENAME1, "w");
+
+	fprintf(plot_data, "t            y\n");
+	printf("t               y\n");
+	fprintf(plot_data, "%0.1f %7.1f\n", t_0, y_0);
+	printf("%0.1f %7.1f\n", t_0, y_0);
+
+	for (t = t_0 + euler_h, y = y_0; t <= t_final; t += euler_h){
+		//f_prime = 3 - 2 * t - 0.5*y;
+		//fprintf(plot_data, "%0.5f %7.6f\n", t, y);
+		f_prime = -5*y;
+		y += f_prime*euler_h; 
+		fprintf(plot_data, "%0.5f %7.6f\n", t, y);
+		printf("%0.5f %7.6f\n", t, y);
+	}
+
+	fclose(plot_data);
+}
+
+void Runge_KuttaMethode(double euler_h, double t_0, double y_0, double t_final){
+	//declare and initialize variables
+	double k1, k2, k3, k4, f_prime, average_slope, t, y;
+	FILE *plot_data;
+
+	plot_data = fopen(FILENAME2, "w");
+
+	fprintf(plot_data, "t            y\n");
+
+	for (t = t_0, y = y_0; t <= t_final; t += euler_h){
+		f_prime = 3 - 2 * t - 0.5*y;
+		k1 = f_prime;
+		k2 = 3 - 2 * (t + euler_h / 2) - 0.5*(y + (0.5*euler_h*k1));
+		k3 = 3 - 2 * (t + euler_h / 2) - 0.5*(y + (0.5*euler_h*k2));
+		k4 = 3 - 2 * (t + euler_h) - 0.5*(y + k3*euler_h);
+		average_slope = (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+		y += euler_h*average_slope;
+		fprintf(plot_data,"%0.3f %5.5f\n", t, y);
+	}
+
+	fclose(plot_data);
+}
+
+/*-------------------------------------------*/
+// This function makes the user decide if they want to repeat the numeration
+int doAgain(void){
+	int choice;
+
+	printf("Enter 1 to recompute, or any other number to stop:");
+	scanf("%i", &choice);
+
+	if (choice == 1)
+		return TRUE;
+	else
+		return 0;
+}
+            </pre>
+        </code>
+    </section>
+    <footer class="contact">
+        <div>
+            <p>Contact me: asaeedi@shaw.ca</p>
+        </div>
+    </footer>
+    <script src="../../script/ode_pprox.js"></script>
+</body>
+
+</html>

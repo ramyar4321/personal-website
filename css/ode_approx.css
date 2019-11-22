@@ -1,0 +1,13 @@
+.approx-methodes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    float: left;
+    flex-direction: column;
+    background-image: url("../img/20160618_150552.jpg");
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 0;
+    height: 700px;
+}

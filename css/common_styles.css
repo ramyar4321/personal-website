@@ -8,14 +8,14 @@ body {
 }
 
 header {
-    background:white;
+    background:black;
+    color: white;
     height: 50px;
     padding: 5px;
     display: flex;
     justify-content: left;
     align-items: center;
 }
-
 
 
 .nav ul {
