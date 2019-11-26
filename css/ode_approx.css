@@ -11,3 +11,27 @@
     padding: 0;
     height: 700px;
 }
+
+.code-source, .code-source-title {
+    background-color: black;
+    display: flex;
+    justify-content: center;
+}
+
+.code-source code pre {
+    color: green;
+}
+
+.flash {
+    animation-name: flash;
+     animation-duration: 0.9s;
+     animation-timing-function: linear;
+     animation-iteration-count: infinite;
+     animation-direction: alternate;
+     animation-play-state: running;
+ }
+ 
+ @keyframes flash {
+     from {color: Green;}
+     to {color: black;}
+ }
