@@ -11,7 +11,7 @@ header {
     background:black;
     color: white;
     height: 50px;
-    padding: 5px;
+    /*padding: 5px;*/
     display: flex;
     justify-content: left;
     align-items: center;
@@ -26,23 +26,30 @@ header {
 
 .nav ul li {
     float: left;
-    margin: 0px 40px;
+    /*margin: 0px 40px;*/
+    padding: 25px;
 }
 
 .nav ul li ul {
     position: absolute;
+    margin: 10px 0px;
 }
 
 .nav ul li ul li {
-    padding: 0px;
+    /*padding: 0px;*/
     float: none;
     display: none;
     margin: 5px 0px;
+    padding: 15px 0px;
 }
 
 .nav ul li:hover ul li {
     display: block;
     /*position: absolute;*/
+}
+
+.nav ul li:hover{
+    background-color: Green;
 }
 
 header a {
