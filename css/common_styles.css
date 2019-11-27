@@ -39,8 +39,16 @@ header {
     /*padding: 0px;*/
     float: none;
     display: none;
-    margin: 5px 0px;
+    /*margin: 5px 0px;*/
     padding: 15px 0px;
+}
+
+.nav ul li:hover{
+    background-color: Green;
+}
+
+.nav ul li:hover ul{
+    background-color: black;
 }
 
 .nav ul li:hover ul li {
@@ -48,9 +56,6 @@ header {
     /*position: absolute;*/
 }
 
-.nav ul li:hover{
-    background-color: Green;
-}
 
 header a {
     text-decoration: none;
