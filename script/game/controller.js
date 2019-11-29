@@ -11,8 +11,17 @@ Controller.prototype = {
         
         this.game.world.player.update();
 
+        block = new Game.Block(this.game.world.canvas.width, this.game.world.canvas.height);
+        this.game.world.blocks.add(block);
+
+        //blocks = this.game.world.blocks.blocks;
+        this.game.world.blocks.updateBlocks();
+
         this.display.drawObject(0, 0, this.game.world.canvas.width, this.game.world.canvas.height, this.game.world.canvas.color);
         this.display.drawObject(this.game.world.player.x, this.game.world.player.y, this.game.world.player.width, this.game.world.player.height, this.game.world.player.color);
+        this.display.drawObjects(this.world.blocks);
+
+
     },
 
     run:function(){

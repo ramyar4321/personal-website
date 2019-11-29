@@ -20,7 +20,7 @@ Game.Canvas.prototype = {
 Game.Player = function(canvas_width, canvas_height, keyOn) {
     this.width = 30;
     this.height = 20;
-    this.xspeed = 2;
+    this.xspeed = 1;
     this.color = "red";
 
     this.canvas_width = canvas_width;
@@ -28,6 +28,8 @@ Game.Player = function(canvas_width, canvas_height, keyOn) {
 
     this.x = canvas_width/2 - this.width/2;
     this.y = canvas_height - this.height;
+
+    this.alive = true;
 
     this.keyOn = keyOn;
 };
@@ -56,6 +58,49 @@ Game.Player.prototype = {
         }
 }
 
+Game.Block = function(canvas_width, canvas_height){
+    this.width = 20;
+    this.height = 10;
+    this.yspeed = 1;
+    this.color = "black"; 
+
+    this.x = Math.floor(Math.random() * (canvas_width - 0 + 1)) + 0;
+    this.y = 0;
+
+    this.alive = true;
+};
+
+Game.Block.prototype = {
+    constructor: Game.Block,
+
+    update:function(){
+        this.y += this.yspeed;
+    }
+};
+
+Game.Blocks = function(){
+    this.blocks = [];
+}
+
+Game.Blocks.prototype = {
+    constructor: Game.Blocks,
+
+    updateBlocks:function(){
+        this.blocks.forEach(block => {
+            block.update();
+        });
+    },
+
+    add:function(){
+        block = new Block();
+        this.blocks.push(block);
+    },
+
+    remove:function(){
+        this.blocks.shift();
+    }
+}
+
 Game.World = function() {
 
     this.keyOn = [];
@@ -63,6 +108,8 @@ Game.World = function() {
     this.canvas = new Game.Canvas();
 
     this.player = new Game.Player(this.canvas.width, this.canvas.height, this.keyOn);
+
+    this.blocks = new Game.Blocks();
 };
 
 Game.World.prototype = {
