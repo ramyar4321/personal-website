@@ -28,7 +28,7 @@
             </ul>
         </div>
     </header>
-    <canvas id="canvas"></canvas>
+    <div><canvas id="canvas"></canvas></div>
     <footer class="contact">
         <div>
             <p>Contact me: asaeedi@shaw.ca</p>
@@ -36,7 +36,7 @@
     </footer>
     <!--Load multiple js files https://stackoverflow.com/questions/53866126/load-multiple-js-file-after-page-load-->
     <script>
-        window.addEventListener('DOMContentLoaded', async () => {
+        window.addEventListener('load', async () => {
             console.log('page loaded')
             try {
                 await loadFileAsync('../../script/game/game.js');

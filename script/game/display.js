@@ -9,14 +9,19 @@ Display.prototype = {
     constructor: Display,
 
     drawObject:function(origin_x, origin_y, object_width, object_height, color){
-        dest_x = origin_x + object_width;
-        dest_y = origin_y - object_height;
+        //dest_x = origin_x + object_width;
+        //dest_y = origin_y + object_height;
         
         this.context.fillStyle =color;
-        this.context.fillRect(origin_x, origin_y, dest_x, dest_y);
+        this.context.fillRect(origin_x, origin_y, object_width, object_height);
     },
 
     clearDisplay:function(canvas_width, canvas_height){
         this.context.clearRect(0,0,canvas_width, canvas_height);
+    },
+
+    initPage:function(canvas_width, canvas_height){
+        this.canvas.width = canvas_width;
+        this.canvas.height = canvas_height;
     }
 };
