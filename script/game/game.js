@@ -91,8 +91,8 @@ Game.Blocks.prototype = {
         });
     },
 
-    add:function(){
-        block = new Block();
+    add:function(canvas_width, canvas_heigth){
+        block = new Game.Block(canvas_width, canvas_heigth);
         this.blocks.push(block);
     },
 
