@@ -29,7 +29,7 @@ Display.prototype = {
         this.context.textBaseline = 'middle';
         this.context.textAlign = 'center';
 
-        this.context.fillText('Press Space to Start Game', this.canvas.width / 2, this.canvas.height / 2);
+        this.context.fillText('Survive for 50 seconds. Press Space to Start Game', this.canvas.width / 2, this.canvas.height / 2);
     },
 
     renderGame: function (player, canvas, blocks, timer) {
@@ -50,10 +50,10 @@ Display.prototype = {
         //this.context.fillText('Press Space to replay', this.canvas.width / 2, this.canvas.height / 2);
         switch(outcome){
             case "won":
-                this.context.fillText('Congradulations You Won! \n Press the space button to replay.', this.canvas.width / 2, this.canvas.height / 2);
+                this.context.fillText('Congradulations You Won! Press the space button to replay.', this.canvas.width / 2, this.canvas.height / 2);
                 break;
             case "lost":
-                this.context.fillText('Game Over. You Lost. \n Press the space button to restart.', this.canvas.width / 2, this.canvas.height / 2);
+                this.context.fillText('Game Over. You Lost. Press the space button to restart.', this.canvas.width / 2, this.canvas.height / 2);
                 break;
             default:
                 break;
