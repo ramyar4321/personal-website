@@ -139,6 +139,35 @@ Game.Timer.prototype = {
     }
 } 
 
+Game.Collision = function(){
+    
+}
+
+Game.Collision.prototype = {
+    constructor: Game.Collision,
+
+    checkCollision:function(player, block){
+        collision_x = false;
+        collision_y =false;
+
+
+        if ((block.y + block.height) >= player.y){
+            collision_y = true;
+        }
+
+        cond1 = (block.x >= player.x) && (block.x <= (player.x + player.width));
+        cond2 = ((block.x + block.width) >= player.x) && ((block.x + block.width) <= (player.x + player.width));
+        if(cond1 || cond2) {
+            collision_x = true;
+        }
+
+        if(collision_x && collision_y){
+            player.alive = false;
+            console.log("collided");
+        }
+    }
+}
+
 Game.World = function() {
 
     this.keyOn = [];
@@ -150,6 +179,8 @@ Game.World = function() {
     this.blocks = new Game.Blocks();
 
     this.timer = new Game.Timer();
+
+    this.collision = new Game.Collision();
 };
 
 Game.World.prototype = {
@@ -160,6 +191,10 @@ Game.World.prototype = {
 
         this.player.updatePlayer();
         this.blocks.updateBlocks();
+
+        this.blocks.blocks.forEach(block =>{
+            this.collision.checkCollision(this.player, block);
+        });
         if(this.timer.intervalLapsed(this.blocks.blockSpawnSec)){
             this.blocks.add(this.canvas.width, this.canvas.height);
             this.timer.setTimeStart(this.timer.timeFrame);
