@@ -1,4 +1,4 @@
-var Game = function(){
+var Game = function () {
 
     this.world = new Game.World();
 };
@@ -7,8 +7,8 @@ Game.prototype = {
     constructor: Game
 };
 
-Game.Canvas = function(){
-    this.width =800;
+Game.Canvas = function () {
+    this.width = 800;
     this.height = 300;
     this.color = "blue";
 };
@@ -17,7 +17,7 @@ Game.Canvas.prototype = {
     constructor: Game.Canvas
 };
 
-Game.Player = function(canvas_width, canvas_height, keyOn) {
+Game.Player = function (canvas_width, canvas_height, keyOn) {
     this.width = 30;
     this.height = 20;
     this.xspeed = 1;
@@ -26,7 +26,7 @@ Game.Player = function(canvas_width, canvas_height, keyOn) {
     this.canvas_width = canvas_width;
     this.canvas_height = canvas_height;
 
-    this.x = canvas_width/2 - this.width/2;
+    this.x = canvas_width / 2 - this.width / 2;
     this.y = canvas_height - this.height;
 
     this.alive = true;
@@ -35,34 +35,34 @@ Game.Player = function(canvas_width, canvas_height, keyOn) {
 };
 
 Game.Player.prototype = {
-    constructor : Game.Player,
+    constructor: Game.Player,
 
-    reset:function(){
-        this.x = this.canvas_width /2 - this.width/ 2;
-        this.y = this.canvas_heigth - this.height;
+    reset: function () {
+        this.x = this.canvas_width / 2 - this.width / 2;
+        this.y = this.canvas_height - this.height;
     },
 
-    updatePlayer:function() {
+    updatePlayer: function () {
 
-        if (this.keyOn[37]) 
-            this.x -= this.xspeed; 
-      
-        if (this.keyOn[39]) 
+        if (this.keyOn[37])
+            this.x -= this.xspeed;
+
+        if (this.keyOn[39])
             this.x += this.xspeed;
 
-        if (this.x < 0) 
-            this.x = 0; 
+        if (this.x < 0)
+            this.x = 0;
 
-        if (this.x + this.width >= this.canvas_width) 
+        if (this.x + this.width >= this.canvas_width)
             this.x = this.canvas_width - this.width;
-        }
+    }
 }
 
-Game.Block = function(canvas_width, canvas_height){
+Game.Block = function (canvas_width, canvas_height) {
     this.width = 20;
     this.height = 10;
     this.yspeed = 1;
-    this.color = "black"; 
+    this.color = "black";
 
     this.canvas_width = canvas_width;
     this.canvas_heigth = canvas_height;
@@ -76,16 +76,16 @@ Game.Block = function(canvas_width, canvas_height){
 Game.Block.prototype = {
     constructor: Game.Block,
 
-    updateBlock:function(){
+    updateBlock: function () {
         this.y += this.yspeed;
 
-        if(this.y > this.canvas_heigth){
-            this.alive =false;
+        if (this.y > this.canvas_heigth) {
+            this.alive = false;
         }
     }
 };
 
-Game.Blocks = function(){
+Game.Blocks = function () {
     this.blocks = [];
 
     this.blockSpawnSec = 1;
@@ -94,27 +94,31 @@ Game.Blocks = function(){
 Game.Blocks.prototype = {
     constructor: Game.Blocks,
 
-    updateBlocks:function(){
+    updateBlocks: function () {
         this.blocks.forEach(block => {
             block.updateBlock();
 
-            if(!block.alive){
+            if (!block.alive) {
                 this.remove();
             }
         });
     },
 
-    add:function(canvas_width, canvas_heigth){
+    add: function (canvas_width, canvas_heigth) {
         block = new Game.Block(canvas_width, canvas_heigth);
         this.blocks.push(block);
     },
 
-    remove:function(){
+    remove: function () {
         this.blocks.shift();
+    },
+
+    resetAllBlocks:function(){
+        this.blocks = [];
     }
 }
 
-Game.Timer = function(){
+Game.Timer = function () {
     this.timeStart = 0;
     this.timeFrame = 0;
 }
@@ -122,53 +126,52 @@ Game.Timer = function(){
 Game.Timer.prototype = {
     constructor: Game.Timer,
 
-    setTimeStart:function(time){
+    setTimeStart: function (time) {
         this.timeStart = time;
     },
 
-    setTimeFrame:function(time){
+    setTimeFrame: function (time) {
         this.timeFrame = time;
     },
 
-    intervalLapsed:function(interval){
-        if(this.timeFrame > (this.timeStart +interval*1000)){
+    intervalLapsed: function (interval) {
+        if (this.timeFrame > (this.timeStart + interval * 1000)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-} 
+}
 
-Game.Collision = function(){
-    
+Game.Collision = function () {
+
 }
 
 Game.Collision.prototype = {
     constructor: Game.Collision,
 
-    checkCollision:function(player, block){
+    checkCollision: function (player, block) {
         collision_x = false;
-        collision_y =false;
+        collision_y = false;
 
 
-        if ((block.y + block.height) >= player.y){
+        if ((block.y + block.height) >= player.y) {
             collision_y = true;
         }
 
         cond1 = (block.x >= player.x) && (block.x <= (player.x + player.width));
         cond2 = ((block.x + block.width) >= player.x) && ((block.x + block.width) <= (player.x + player.width));
-        if(cond1 || cond2) {
+        if (cond1 || cond2) {
             collision_x = true;
         }
 
-        if(collision_x && collision_y){
+        if (collision_x && collision_y) {
             player.alive = false;
-            console.log("collided");
         }
     }
 }
 
-Game.World = function() {
+Game.World = function () {
 
     this.keyOn = [];
 
@@ -181,23 +184,51 @@ Game.World = function() {
     this.timer = new Game.Timer();
 
     this.collision = new Game.Collision();
+
+    this.state = "game_start";
 };
 
 Game.World.prototype = {
-    constructor : Game.World,
+    constructor: Game.World,
 
-    updateWorld:function(){
-        this.timer.setTimeFrame(new Date().getTime());
+    updateWorld: function () {
 
-        this.player.updatePlayer();
-        this.blocks.updateBlocks();
+        switch (this.state) {
+            case "game_start":
+                if (this.keyOn[32]) {
+                    this.state = "game_play";
+                }
+                break;
+            case "game_play":
+                this.blocks.blocks.forEach(block => {
+                    this.collision.checkCollision(this.player, block);
+                });
 
-        this.blocks.blocks.forEach(block =>{
-            this.collision.checkCollision(this.player, block);
-        });
-        if(this.timer.intervalLapsed(this.blocks.blockSpawnSec)){
-            this.blocks.add(this.canvas.width, this.canvas.height);
-            this.timer.setTimeStart(this.timer.timeFrame);
+                if (this.player.alive) {
+
+                    this.player.updatePlayer();
+                    this.blocks.updateBlocks();
+
+                    this.timer.setTimeFrame(new Date().getTime());
+
+                    if (this.timer.intervalLapsed(this.blocks.blockSpawnSec)) {
+                        this.blocks.add(this.canvas.width, this.canvas.height);
+                        this.timer.setTimeStart(this.timer.timeFrame);
+                    }
+                } else {
+                    this.state = "game_over";
+                }
+                break;
+            case "game_over":
+                if (this.keyOn[32]) {
+                    this.state = "game_play";
+                    this.player.reset();
+                    this.blocks.resetAllBlocks();
+                    this.player.alive = true;
+                }
+                break;
+            default:
+                break;
         }
     }
 };

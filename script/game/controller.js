@@ -1,4 +1,4 @@
-var Controller =function(Game, Display){
+var Controller = function (Game, Display) {
     this.game = Game;
     this.display = Display;
 };
@@ -6,26 +6,40 @@ var Controller =function(Game, Display){
 Controller.prototype = {
     constructor: Controller,
 
-    gameLoop:function(){        
+    gameLoop: function () {
+
         this.game.world.updateWorld();
 
-        this.display.render(this.game.world.player, this.game.world.canvas, this.game.world.blocks);
+        switch (this.game.world.state) {
+            case "game_start":
+                this.display.renderStart();
+                break;
+            case "game_play":
+                this.display.renderGame(this.game.world.player, this.game.world.canvas, this.game.world.blocks);
+                break;
+            case "game_over":
+                this.display.renderOver();
+                break;
+            default:
+                break;
+        }
+
     },
 
-    run:function(){
+    run: function () {
 
-        this.display.initPage(this.game.world.canvas.width, this.game.world.canvas.height);
+        this.display.initCanvas(this.game.world.canvas.width, this.game.world.canvas.height);
 
         that = this.game.world;
-        document.addEventListener("keydown", function(event){
+        document.addEventListener("keydown", function (event) {
             //this.game.world.keyOn[event.keyCode] = true;
             that.keyOn[event.keyCode] = true;
-        },false);
+        }, false);
 
-        document.addEventListener("keyup", function(event){
+        document.addEventListener("keyup", function (event) {
             that.keyOn[event.keyCode] = false;
-        },false);
+        }, false);
 
-        interval = setInterval(this.gameLoop, 30/1000);
+        interval = setInterval(this.gameLoop, 30 / 1000);
     }
 };
