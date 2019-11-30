@@ -41,13 +41,23 @@ Display.prototype = {
         document.getElementById("countdown").innerHTML = timer.countdown;
     },
 
-    renderOver: function () { 
+    renderOver: function (outcome) { 
         this.clearDisplay(this.canvas.width, this.canvas.height);
 
         this.context.textBaseline = 'middle';
         this.context.textAlign = 'center';
 
-        this.context.fillText('Press Space to replay', this.canvas.width / 2, this.canvas.height / 2);
+        //this.context.fillText('Press Space to replay', this.canvas.width / 2, this.canvas.height / 2);
+        switch(outcome){
+            case "won":
+                this.context.fillText('Congradulations You Won! \n Press the space button to replay.', this.canvas.width / 2, this.canvas.height / 2);
+                break;
+            case "lost":
+                this.context.fillText('Game Over. You Lost. \n Press the space button to restart.', this.canvas.width / 2, this.canvas.height / 2);
+                break;
+            default:
+                break;
+        }
     },
 
     initCanvas: function (canvas_width, canvas_height) {

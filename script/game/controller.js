@@ -18,7 +18,7 @@ Controller.prototype = {
                 this.display.renderGame(this.game.world.player, this.game.world.canvas, this.game.world.blocks, this.game.world.timer);
                 break;
             case "game_over":
-                this.display.renderOver();
+                this.display.renderOver(this.game.world.outcome);
                 break;
             default:
                 break;

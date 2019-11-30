@@ -216,7 +216,7 @@ Game.Collision.prototype = {
         }
 
         if (collision_x && collision_y) {
-            player.alive = false;
+            return true;
         }
     }
 }
@@ -236,6 +236,8 @@ Game.World = function () {
     this.collision = new Game.Collision();
 
     this.state = "game_start";
+
+    this.outcome = "";
 };
 
 Game.World.prototype = {
@@ -250,14 +252,8 @@ Game.World.prototype = {
                 }
                 break;
             case "game_play":
-                this.blocks.blocks.forEach(block => {
-                    this.collision.checkCollision(this.player, block);
-                });
 
                 if (this.player.alive) {
-
-                    this.player.updatePlayer();
-                    this.blocks.updateBlocks();
 
                     date = new Date().getTime();
 
@@ -272,8 +268,18 @@ Game.World.prototype = {
                         this.timer.decrementCountDown();
                         this.timer.setTimeStart_countdown(this.timer.timeFrame_countdown);
                     }
+                    
+                    this.blocks.blocks.forEach(block => {
+                        if(this.collision.checkCollision(this.player, block)){
+                            this.player.alive =false;
+                            this.outcome = "lost";
+                        }
+                    });
+                    this.player.updatePlayer();
+                    this.blocks.updateBlocks();
                     if(this.timer.isCountDownDone()){
                         this.player.alive = false;
+                        this.outcome = "won";
                     }
 
 
@@ -287,6 +293,7 @@ Game.World.prototype = {
                     this.player.reset();
                     this.blocks.resetAllBlocks();
                     this.timer.resetCountdown();
+                    this.outcome = "";
                     this.player.alive = true;
                 }
                 break;
