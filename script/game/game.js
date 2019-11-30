@@ -42,7 +42,7 @@ Game.Player.prototype = {
         this.y = this.canvas_heigth - this.height;
     },
 
-    update:function() {
+    updatePlayer:function() {
 
         if (this.keyOn[37]) 
             this.x -= this.xspeed; 
@@ -64,7 +64,10 @@ Game.Block = function(canvas_width, canvas_height){
     this.yspeed = 1;
     this.color = "black"; 
 
-    this.x = Math.floor(Math.random() * (canvas_width - 0 + 1)) + 0;
+    this.canvas_width = canvas_width;
+    this.canvas_heigth = canvas_height;
+
+    this.x = Math.floor(Math.random() * (this.canvas_width - 0 + 1)) + 0;
     this.y = 0;
 
     this.alive = true;
@@ -73,13 +76,19 @@ Game.Block = function(canvas_width, canvas_height){
 Game.Block.prototype = {
     constructor: Game.Block,
 
-    update:function(){
+    updateBlock:function(){
         this.y += this.yspeed;
+
+        if(this.y > this.canvas_heigth){
+            this.alive =false;
+        }
     }
 };
 
 Game.Blocks = function(){
     this.blocks = [];
+
+    this.blockSpawnSec = 1;
 }
 
 Game.Blocks.prototype = {
@@ -87,7 +96,11 @@ Game.Blocks.prototype = {
 
     updateBlocks:function(){
         this.blocks.forEach(block => {
-            block.update();
+            block.updateBlock();
+
+            if(!block.alive){
+                this.remove();
+            }
         });
     },
 
@@ -101,6 +114,31 @@ Game.Blocks.prototype = {
     }
 }
 
+Game.Timer = function(){
+    this.timeStart = 0;
+    this.timeFrame = 0;
+}
+
+Game.Timer.prototype = {
+    constructor: Game.Timer,
+
+    setTimeStart:function(time){
+        this.timeStart = time;
+    },
+
+    setTimeFrame:function(time){
+        this.timeFrame = time;
+    },
+
+    intervalLapsed:function(interval){
+        if(this.timeFrame > (this.timeStart +interval*1000)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+} 
+
 Game.World = function() {
 
     this.keyOn = [];
@@ -110,8 +148,21 @@ Game.World = function() {
     this.player = new Game.Player(this.canvas.width, this.canvas.height, this.keyOn);
 
     this.blocks = new Game.Blocks();
+
+    this.timer = new Game.Timer();
 };
 
 Game.World.prototype = {
-    constructor : Game.World
+    constructor : Game.World,
+
+    updateWorld:function(){
+        this.timer.setTimeFrame(new Date().getTime());
+
+        this.player.updatePlayer();
+        this.blocks.updateBlocks();
+        if(this.timer.intervalLapsed(this.blocks.blockSpawnSec)){
+            this.blocks.add(this.canvas.width, this.canvas.height);
+            this.timer.setTimeStart(this.timer.timeFrame);
+        }
+    }
 };

@@ -23,6 +23,14 @@ Display.prototype = {
         this.context.clearRect(0,0,canvas_width, canvas_height);
     },
 
+    render:function(player, canvas, blocks){
+        this.clearDisplay(canvas.width, canvas.height);
+        this.drawObject(0, 0, canvas.width, canvas.height, canvas.color);
+        this.drawObject(player.x, player.y, player.width, player.height, player.color);
+        this.drawObjects(blocks.blocks);
+
+    },
+
     initPage:function(canvas_width, canvas_height){
         this.canvas.width = canvas_width;
         this.canvas.height = canvas_height;

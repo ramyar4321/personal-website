@@ -6,20 +6,10 @@ var Controller =function(Game, Display){
 Controller.prototype = {
     constructor: Controller,
 
-    gameLoop:function(){
-        this.display.clearDisplay(this.game.world.canvas.width, this.game.world.canvas.height);
-        
-        this.game.world.player.update();
+    gameLoop:function(){        
+        this.game.world.updateWorld();
 
-        //blocks = this.game.world.blocks.blocks;
-        this.game.world.blocks.updateBlocks();
-
-        this.display.drawObject(0, 0, this.game.world.canvas.width, this.game.world.canvas.height, this.game.world.canvas.color);
-        this.display.drawObject(this.game.world.player.x, this.game.world.player.y, this.game.world.player.width, this.game.world.player.height, this.game.world.player.color);
-        this.display.drawObjects(this.game.world.blocks.blocks);
-
-        this.game.world.blocks.add(this.game.world.canvas.width, this.game.world.canvas.height);
-
+        this.display.render(this.game.world.player, this.game.world.canvas, this.game.world.blocks);
     },
 
     run:function(){
