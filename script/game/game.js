@@ -113,33 +113,83 @@ Game.Blocks.prototype = {
         this.blocks.shift();
     },
 
-    resetAllBlocks:function(){
+    resetAllBlocks: function () {
         this.blocks = [];
     }
 }
 
 Game.Timer = function () {
-    this.timeStart = 0;
-    this.timeFrame = 0;
+    this.time_type_blockspawn = "blockspawn";
+    this.time_type_countdown = "countdown";
+
+    this.timeStart_blockspawn = 0;
+    this.timeFrame_blockspawn = 0;
+
+    this.timeStart_countdown = 0;
+    this.timeFrame_countdown = 0;
+    this.countdown = 50;
+    this.countdownSec = 1;
 }
 
 Game.Timer.prototype = {
     constructor: Game.Timer,
 
-    setTimeStart: function (time) {
-        this.timeStart = time;
+    setTimeStart_blockspawn: function (time_blockspawn) {
+        this.timeStart_blockspawn = time_blockspawn;
     },
 
-    setTimeFrame: function (time) {
-        this.timeFrame = time;
+    setTimeFrame_blockspawn: function (time_blockspawn) {
+        this.timeFrame_blockspawn = time_blockspawn;
     },
 
-    intervalLapsed: function (interval) {
-        if (this.timeFrame > (this.timeStart + interval * 1000)) {
-            return true;
-        } else {
+    setTimeStart_countdown: function (time_countdown) {
+        this.timeStart_countdown = time_countdown;
+    },
+
+    setTimeFrame_countdown: function (time_countdown) {
+        this.timeFrame_countdown = time_countdown;
+    },
+
+    decrementCountDown: function () {
+        this.countdown -= 1;
+    },
+
+    isCountDownDone: function () {
+        if (this.countdown > 0) {
             return false;
+        } else {
+            return true;
         }
+    },
+
+    resetCountdown: function () {
+        this.countdown = 50;
+    },
+
+    intervalLapsed: function (interval, time_type) {
+
+        return_value = false;
+
+        switch (time_type) {
+            case "blockspawn":
+                if (this.timeFrame_blockspawn > (this.timeStart_blockspawn + interval * 1000)) {
+                    return_value = true;
+                } else {
+                    return_value = false;
+                }
+                break;
+            case "countdown":
+                if (this.timeFrame_countdown > (this.timeStart_countdown + interval * 1000)) {
+                    return_value = true;
+                } else {
+                    return_value = false;
+                }
+                break;
+            default:
+                return_value = false;
+                break;
+        }
+        return return_value;
     }
 }
 
@@ -209,12 +259,24 @@ Game.World.prototype = {
                     this.player.updatePlayer();
                     this.blocks.updateBlocks();
 
-                    this.timer.setTimeFrame(new Date().getTime());
+                    date = new Date().getTime();
 
-                    if (this.timer.intervalLapsed(this.blocks.blockSpawnSec)) {
+                    this.timer.setTimeFrame_blockspawn(date);
+                    if (this.timer.intervalLapsed(this.blocks.blockSpawnSec,  this.timer.time_type_blockspawn)) {
                         this.blocks.add(this.canvas.width, this.canvas.height);
-                        this.timer.setTimeStart(this.timer.timeFrame);
+                        this.timer.setTimeStart_blockspawn(this.timer.timeFrame_blockspawn);
                     }
+
+                    this.timer.setTimeFrame_countdown(date);
+                    if (this.timer.intervalLapsed(this.timer.countdownSec, this.timer.time_type_countdown)){
+                        this.timer.decrementCountDown();
+                        this.timer.setTimeStart_countdown(this.timer.timeFrame_countdown);
+                    }
+                    if(this.timer.isCountDownDone()){
+                        this.player.alive = false;
+                    }
+
+
                 } else {
                     this.state = "game_over";
                 }
@@ -224,6 +286,7 @@ Game.World.prototype = {
                     this.state = "game_play";
                     this.player.reset();
                     this.blocks.resetAllBlocks();
+                    this.timer.resetCountdown();
                     this.player.alive = true;
                 }
                 break;

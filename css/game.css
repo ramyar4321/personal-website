@@ -1,4 +1,15 @@
-/*div .canvas {
-    margin: 0px;
-    padding: 0px;
-}*/
+#game {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    margin: 100px 0px;
+}
+
+#timer {
+    background-color: black;
+    color: white;
+    width: 80px;
+    margin: 20px auto;
+    border-radius: 50%;
+}

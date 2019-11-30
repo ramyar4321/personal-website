@@ -32,12 +32,13 @@ Display.prototype = {
         this.context.fillText('Press Space to Start Game', this.canvas.width / 2, this.canvas.height / 2);
     },
 
-    renderGame: function (player, canvas, blocks) {
+    renderGame: function (player, canvas, blocks, timer) {
         this.clearDisplay(canvas.width, canvas.height);
         this.drawObject(0, 0, canvas.width, canvas.height, canvas.color);
         this.drawObject(player.x, player.y, player.width, player.height, player.color);
         this.drawObjects(blocks.blocks);
 
+        document.getElementById("countdown").innerHTML = timer.countdown;
     },
 
     renderOver: function () { 
