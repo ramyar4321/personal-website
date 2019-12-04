@@ -1,8 +1,24 @@
+/**
+ * 
+ * This object facilitates communication between the model Game class
+ * and the view Display class.
+ * 
+ * @param {Game} Game 
+ * @param {Display} Display 
+ */
 var Controller = function (Game, Display) {
     this.game = Game;
     this.display = Display;
 };
 
+/**
+ * This function is called every 30/1000 milliseconds by the setInterval function
+ * It will call the model Game object to update the game world, the all the
+ * view Display class to render the game on screen.
+ * 
+ * @constructor
+ * 
+ */
 Controller.prototype = {
     constructor: Controller,
 
@@ -26,13 +42,18 @@ Controller.prototype = {
 
     },
 
+    /**
+     * This function will:
+     *      1. Initiate the canvas onto which the game will be rendered.
+     *      2. Create listeners for key events. 
+     *      3. Use setInterval to call game loop every 30/1000 milliseconds.
+     */
     run: function () {
 
         this.display.initCanvas(this.game.world.canvas.width, this.game.world.canvas.height);
 
         that = this.game.world;
         document.addEventListener("keydown", function (event) {
-            //this.game.world.keyOn[event.keyCode] = true;
             that.keyOn[event.keyCode] = true;
         }, false);
 

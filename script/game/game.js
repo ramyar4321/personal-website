@@ -1,22 +1,44 @@
+
+/**
+ * Stores game world settings and logic.
+ */
 var Game = function () {
 
     this.world = new Game.World();
 };
 
+/**
+ * 
+ * Constructs a Game object.
+ * 
+ * @constructor
+ */
 Game.prototype = {
     constructor: Game
 };
 
+/**
+ * Stores Canvas data.
+ */
 Game.Canvas = function () {
     this.width = 800;
     this.height = 300;
     this.color = "blue";
 };
 
+/**
+ * Constructs Canvas object.
+ * 
+ * @constructor
+ * 
+ */
 Game.Canvas.prototype = {
     constructor: Game.Canvas
 };
 
+/**
+ * Stores Player data and logic.
+ */
 Game.Player = function (canvas_width, canvas_height, keyOn) {
     this.width = 30;
     this.height = 20;
@@ -34,14 +56,28 @@ Game.Player = function (canvas_width, canvas_height, keyOn) {
     this.keyOn = keyOn;
 };
 
+/**
+ * Construct the player
+ * 
+ * @constructor
+ * 
+ */
 Game.Player.prototype = {
     constructor: Game.Player,
 
+    /** 
+     * This function resets the player back to the 
+     * bottom middle of the screen.
+    */
     reset: function () {
         this.x = this.canvas_width / 2 - this.width / 2;
         this.y = this.canvas_height - this.height;
     },
 
+    /**
+     * This function moves the player left or right depending
+     * on key presses.
+     */
     updatePlayer: function () {
 
         if (this.keyOn[37])
@@ -58,6 +94,9 @@ Game.Player.prototype = {
     }
 }
 
+/**
+ * Stores Block data and logic. 
+ */
 Game.Block = function (canvas_width, canvas_height) {
     this.width = 20;
     this.height = 10;
@@ -73,9 +112,18 @@ Game.Block = function (canvas_width, canvas_height) {
     this.alive = true;
 };
 
+/**
+ * Construct Block object.
+ * 
+ * @constructor
+ */
 Game.Block.prototype = {
     constructor: Game.Block,
 
+    /**
+     * This function moves the block object
+     * at a given spend.
+     */
     updateBlock: function () {
         this.y += this.yspeed;
 
@@ -85,39 +133,71 @@ Game.Block.prototype = {
     }
 };
 
+/**
+ * Stores all the blocks and spawn speed.
+ */
 Game.Blocks = function () {
     this.blocks = [];
 
     this.blockSpawnSec = 1;
 }
 
+
 Game.Blocks.prototype = {
     constructor: Game.Blocks,
 
+    /**
+     * Update each block in list of blocks.
+     */
     updateBlocks: function () {
         this.blocks.forEach(block => {
+            // Update each block, i.e move it.
             block.updateBlock();
 
+            // A block is not alive if it has moved
+            // outside of the screen.
             if (!block.alive) {
                 this.remove();
             }
         });
     },
 
+
+    /**
+     * This function adds a new block to list of blocks.
+     * @param {number} canvas_width     Width of Canvas
+     * @param {number} canvas_heigth    Height of Canvas
+     */
     add: function (canvas_width, canvas_heigth) {
         block = new Game.Block(canvas_width, canvas_heigth);
         this.blocks.push(block);
     },
 
+    /**
+     * This function is called when a block is to be removed
+     * from the list of blocks. This happens when a block has 
+     * moved outside of Canvas. Logically, the first block
+     * in the list would be the first to move outside of the canvas 
+     * thus we only need to remove the first block and shift the rest.
+     */
     remove: function () {
         this.blocks.shift();
     },
 
+    /**
+     * Empty the list of blocks. This function is called
+     * when the game is reset. 
+     */
     resetAllBlocks: function () {
         this.blocks = [];
     }
 }
 
+/**
+ * Stores all the timer data, namely, the timer data
+ * corresponding to tracking block spawn time and 
+ * countdown time.
+ */
 Game.Timer = function () {
     this.time_type_blockspawn = "blockspawn";
     this.time_type_countdown = "countdown";
@@ -131,29 +211,60 @@ Game.Timer = function () {
     this.countdownSec = 1;
 }
 
+/**
+ * Construct the game object.
+ * 
+ * @constructor
+ */
 Game.Timer.prototype = {
     constructor: Game.Timer,
 
+    /**
+     * Setter function for Time Start ticker
+     * 
+     * @param {number} time_blockspawn  Time Start for blockspawn ticker 
+     */
     setTimeStart_blockspawn: function (time_blockspawn) {
         this.timeStart_blockspawn = time_blockspawn;
     },
 
+    /**
+     * Setter function for Time Frame ticker
+     * 
+     * @param {number} time_blockspawn  Time Frame for blockspawn ticker 
+     */
     setTimeFrame_blockspawn: function (time_blockspawn) {
         this.timeFrame_blockspawn = time_blockspawn;
     },
 
+    /**
+     * Setter function for Time Start ticker
+     * 
+     * @param {number} time_countdown  Time Start for blockspawn ticker 
+     */
     setTimeStart_countdown: function (time_countdown) {
         this.timeStart_countdown = time_countdown;
     },
 
+    /**
+     * Setter function for Time Frame ticker
+     * 
+     * @param {number} time_countdown  Time Frame for countdown ticker 
+     */
     setTimeFrame_countdown: function (time_countdown) {
         this.timeFrame_countdown = time_countdown;
     },
 
+    /**
+     * Decrease the counter by 1.
+     */
     decrementCountDown: function () {
         this.countdown -= 1;
     },
 
+    /**
+     * This function determines if the counter has reached 0.
+     */
     isCountDownDone: function () {
         if (this.countdown > 0) {
             return false;
@@ -162,10 +273,19 @@ Game.Timer.prototype = {
         }
     },
 
+    /**
+     * Reset counter back to 50. 
+     */
     resetCountdown: function () {
         this.countdown = 50;
     },
 
+    /**
+     * 
+     * @param {number} interval     Time in milliseconds that ticker must count
+     * @param {string} time_type    Determine if function is being called for
+     *                              countdown ticker or block spawn ticker.
+     */
     intervalLapsed: function (interval, time_type) {
 
         return_value = false;
@@ -193,9 +313,13 @@ Game.Timer.prototype = {
     }
 }
 
+/**
+ * Store collision logic .
+ */
 Game.Collision = function () {
 
 }
+
 
 Game.Collision.prototype = {
     constructor: Game.Collision,
@@ -221,6 +345,9 @@ Game.Collision.prototype = {
     }
 }
 
+/**
+ * Store game world data and logic.
+ */
 Game.World = function () {
 
     this.keyOn = [];
@@ -240,55 +367,85 @@ Game.World = function () {
     this.outcome = "";
 };
 
+/**
+ * Construct Game WOrld object
+ */
 Game.World.prototype = {
     constructor: Game.World,
 
+    /**
+     * This function updates the state of the game world.
+     */
     updateWorld: function () {
 
         switch (this.state) {
+            // If the game is at loading screen:
             case "game_start":
+                // once the player has hit the space button, start the game
                 if (this.keyOn[32]) {
                     this.state = "game_play";
                 }
                 break;
+
+            // If the game is being played:
             case "game_play":
 
+                // Check if the game has ended
                 if (this.player.alive) {
 
-                    date = new Date().getTime();
+                    // If the game is not yet over:
 
+                    // Determine if an interval has passed:
+                    date = new Date().getTime();
                     this.timer.setTimeFrame_blockspawn(date);
-                    if (this.timer.intervalLapsed(this.blocks.blockSpawnSec,  this.timer.time_type_blockspawn)) {
+                    if (this.timer.intervalLapsed(this.blocks.blockSpawnSec, this.timer.time_type_blockspawn)) {
+                        // If interval has passed, then spawn new block
+                        // and start ticking till next spawn time.
                         this.blocks.add(this.canvas.width, this.canvas.height);
                         this.timer.setTimeStart_blockspawn(this.timer.timeFrame_blockspawn);
                     }
-
+                    // Determine if an interval has passed:
                     this.timer.setTimeFrame_countdown(date);
-                    if (this.timer.intervalLapsed(this.timer.countdownSec, this.timer.time_type_countdown)){
+                    if (this.timer.intervalLapsed(this.timer.countdownSec, this.timer.time_type_countdown)) {
+                        // If an interval has passed, the decrement the game counter by 1
+                        // and start ticking till next spawn time.
                         this.timer.decrementCountDown();
                         this.timer.setTimeStart_countdown(this.timer.timeFrame_countdown);
                     }
-                    
+
+                    // Check if the player has collided with any blocks.
                     this.blocks.blocks.forEach(block => {
-                        if(this.collision.checkCollision(this.player, block)){
-                            this.player.alive =false;
+                        if (this.collision.checkCollision(this.player, block)) {
+                            // If so, the game is over and the player has lost.
+                            this.player.alive = false;
                             this.outcome = "lost";
                         }
                     });
+
+                    // Update the blocks and player, i.e move the blocks down
+                    // and the player right or left depending on key presses.
                     this.player.updatePlayer();
                     this.blocks.updateBlocks();
-                    if(this.timer.isCountDownDone()){
+
+
+                    // Check if the game counter has reached zero.
+                    if (this.timer.isCountDownDone()) {
+                        // if so, the the game is over and the player has won
                         this.player.alive = false;
                         this.outcome = "won";
                     }
 
 
                 } else {
+                    // Game has ended.
                     this.state = "game_over";
                 }
                 break;
+                
             case "game_over":
+                // Check if the game is over:
                 if (this.keyOn[32]) {
+                    // Reset game world.
                     this.state = "game_play";
                     this.player.reset();
                     this.blocks.resetAllBlocks();
