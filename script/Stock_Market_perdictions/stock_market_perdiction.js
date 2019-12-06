@@ -166,7 +166,6 @@ let plot_stock_info = function (stock_info) {
                     {
                         type: 'line',
                         label: "Open",
-                        fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
                         backgroundColor: 'rgb(75, 214, 238)',
@@ -184,7 +183,7 @@ let plot_stock_info = function (stock_info) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 5,
                         pointHitRadius: 10,
-                        data: [stock_info.open_info],
+                        data: stock_info.open_info,
                     },
                     {
                         type: 'line',
@@ -207,7 +206,7 @@ let plot_stock_info = function (stock_info) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 5,
                         pointHitRadius: 10,
-                        data: [stock_info.high_info],
+                        data: stock_info.high_info,
                     },
                     {
                         type: 'line',
@@ -230,7 +229,7 @@ let plot_stock_info = function (stock_info) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 5,
                         pointHitRadius: 10,
-                        data: [stock_info.low_info],
+                        data: stock_info.low_info,
                     },
                     {
                         type: 'line',
@@ -253,9 +252,10 @@ let plot_stock_info = function (stock_info) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 5,
                         pointHitRadius: 10,
-                        data: [stock_info.close_info],
+                        data: stock_info.close_info,
                     },
                     {
+                        type: 'line',
                         label: 'Volume', //1D2939
                         yAxisID: 'y-axis-b',
                         barPercentage: '1',
@@ -267,7 +267,7 @@ let plot_stock_info = function (stock_info) {
                         hoverBackgroundColor: 'rgb(29, 41, 57)',
                         hoverBorderColor: 'rgb(29, 41, 57)',
                         hoverBorderWidth: '3',
-                        data: [stock_info.volume_info]
+                        data: stock_info.volume_info
                     },
                 ]
             },
