@@ -65,20 +65,23 @@ let parseStockData = function (jsonData) {
             reject("Undefined Stock data")
         }
 
+        time = [];
         open = [];
         high = [];
         low = [];
         close = [];
         volume = [];
-        for (var time in stockData) {
-            open.push([time, stockData[time]["1. open"]]);
-            high.push([time, stockData[time]["2. high"]]);
-            low.push([time, stockData[time]["3. low"]]);
-            close.push([time, stockData[time]["4. close"]]);
-            volume.push([time, stockData[time]["5. volume"]]);
+        for (var t in stockData) {
+            time.push(t);
+            open.push(stockData[t]["1. open"]);
+            high.push(stockData[t]["2. high"]);
+            low.push(stockData[t]["3. low"]);
+            close.push(stockData[t]["4. close"]);
+            volume.push(stockData[t]["5. volume"]);
         }
 
         stock_info = {
+            time_info: time,
             open_info: open,
             high_info: high,
             low_info: low,
@@ -107,26 +110,21 @@ let parseStockData = function (jsonData) {
  */
 let data_cleaning = function (stock_info) {
     return new Promise(function (resolve, reject) {
-        stock_lengths = [stock_info.open_info.length, stock_info.high_info.length,
+        stock_lengths = [stock_info.time_info.length, stock_info.open_info.length, stock_info.high_info.length,
         stock_info.low_info.length, stock_info.close_info.length, stock_info.volume_info.length];
         if (!stock_lengths.every(function (v) { return v === stock_lengths[0]; })) {
             reject("Stock informations are not of the same lengths");
         }
 
-        //for(var){}
         for (var i = 0; i < stock_lengths[0]; i++) {
-            if (isNaN(Date.parse(stock_info.open_info[i][0])) ||
-                isNaN(Date.parse(stock_info.high_info[i][0])) ||
-                isNaN(Date.parse(stock_info.low_info[i][0])) ||
-                isNaN(Date.parse(stock_info.close_info[i][0])) ||
-                isNaN(Date.parse(stock_info.volume_info[i][0]))) {
+            if (isNaN(Date.parse(stock_info.time_info[i]))) {
                 reject("Invalid date given");
             }
-            if (isNaN(stock_info.open_info[i][1]) ||
-                isNaN(stock_info.high_info[i][1]) ||
-                isNaN(stock_info.low_info[i][1]) ||
-                isNaN(stock_info.close_info[i][1]) ||
-                isNaN(stock_info.volume_info[i][1])) {
+            if (isNaN(stock_info.open_info[i]) ||
+                isNaN(stock_info.high_info[i]) ||
+                isNaN(stock_info.low_info[i]) ||
+                isNaN(stock_info.close_info[i]) ||
+                isNaN(stock_info.volume_info[i])) {
                 reject("Invalid value given");
             }
 
@@ -139,6 +137,7 @@ let data_cleaning = function (stock_info) {
 /**
  * 
  * @param {Object} stock_info Contains time and stock value for:
+ *                                  - Dates 
  *                                  - Opening prices
  *                                  - High prices
  *                                  - Low prices
@@ -148,55 +147,153 @@ let data_cleaning = function (stock_info) {
 let plot_stock_info = function (stock_info) {
     return new Promise(function (resolve, reject) {
 
-        labels = [];
-        data = [];
-        //console.log(stock_info.close_info);
-        labels.push(stock_info.close_info.map(function (x) {
-            return x[0];
-        }));
-        data.push(stock_info.close_info.map(function (x) {
-            return x[1];
-        }));
-
-
-        //console.log(data);
 
         var canvas = document.getElementById("open_stock_info");
         var context = canvas.getContext('2d');
 
+        console.log(stock_info.time_info);
+        console.log(stock_info.open_info);
+        console.log(stock_info.high_info);
+        console.log(stock_info.low_info);
+        console.log(stock_info.close_info);
+        console.log(stock_info.volume_info);
 
         var myChart = new Chart(context, {
             type: 'bar',
-            data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
+            data: data = {
+                labels: stock_info.time_info,
+                datasets: [
+                    {
+                        type: 'line',
+                        label: "Open",
+                        fill: false,
+                        yAxisID: 'y-axis-a',
+                        lineTension: 0.1,
+                        backgroundColor: 'rgb(75, 214, 238)',
+                        borderColor: 'rgb(75, 214, 238)',
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: 'rgb(75, 214, 238)',
+                        pointBackgroundColor: 'rgb(75, 214, 238)',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: 'rgb(75, 214, 238)',
+                        pointHoverBorderColor: 'rgb(75, 214, 238)',
+                        pointHoverBorderWidth: 3,
+                        pointRadius: 5,
+                        pointHitRadius: 10,
+                        data: [stock_info.open_info],
+                    },
+                    {
+                        type: 'line',
+                        label: "High",
+                        fill: false,
+                        yAxisID: 'y-axis-a',
+                        lineTension: 0.1,
+                        backgroundColor: 'rgb(210, 221, 72)',
+                        borderColor: 'rgb(210, 221, 72)',
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: 'rgb(210, 221, 72)',
+                        pointBackgroundColor: 'rgb(210, 221, 72)',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: 'rgb(210, 221, 72)',
+                        pointHoverBorderColor: 'rgb(210, 221, 72)',
+                        pointHoverBorderWidth: 3,
+                        pointRadius: 5,
+                        pointHitRadius: 10,
+                        data: [stock_info.high_info],
+                    },
+                    {
+                        type: 'line',
+                        label: "Low",
+                        fill: false,
+                        yAxisID: 'y-axis-a',
+                        lineTension: 0.1,
+                        backgroundColor: 'rgb(238, 79, 75)',
+                        borderColor: 'rgb(238, 79, 75)',
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: 'rgb(238, 79, 75)',
+                        pointBackgroundColor: 'rgb(238, 79, 75)',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: 'rgb(238, 79, 75)',
+                        pointHoverBorderColor: 'rgb(238, 79, 75)',
+                        pointHoverBorderWidth: 3,
+                        pointRadius: 5,
+                        pointHitRadius: 10,
+                        data: [stock_info.low_info],
+                    },
+                    {
+                        type: 'line',
+                        label: "Close",
+                        fill: false,
+                        yAxisID: 'y-axis-a',
+                        lineTension: 0.1,
+                        backgroundColor: 'rgb(28, 175, 154)',
+                        borderColor: 'rgb(28, 175, 154)',
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: 'rgb(28, 175, 154)',
+                        pointBackgroundColor: 'rgb(28, 175, 154)',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: 'rgb(28, 175, 154)',
+                        pointHoverBorderColor: 'rgb(28, 175, 154)',
+                        pointHoverBorderWidth: 3,
+                        pointRadius: 5,
+                        pointHitRadius: 10,
+                        data: [stock_info.close_info],
+                    },
+                    {
+                        label: 'Volume', //1D2939
+                        yAxisID: 'y-axis-b',
+                        barPercentage: '1',
+                        categoryPercentage: '1',
+                        backgroundColor: 'rgb(29, 41, 57)',
+                        borderColor: 'rgb(29, 41, 57)',
+                        borderWidth: '1',
+                        borderSkipped: 'bottom',
+                        hoverBackgroundColor: 'rgb(29, 41, 57)',
+                        hoverBorderColor: 'rgb(29, 41, 57)',
+                        hoverBorderWidth: '3',
+                        data: [stock_info.volume_info]
+                    },
+                ]
             },
             options: {
+                title: {
+                    display: true,
+                    text: 'Share Price - Past 7 Days',
+                    fontSize: '20',
+                    fontFamily: 'Open Sans, sans-serif',
+                    // fontColor
+                    // fontStyle
+                    // padding
+                    // lineHeight
+                },
                 scales: {
-                    yAxes: [{
+                    xAxes: [{
                         ticks: {
-                            beginAtZero: true
+                            min: 0
                         }
+                    }],
+                    yAxes: [{
+                        position: "left",
+                        id: "y-axis-a",
+                    }, {
+                        position: "right",
+                        id: "y-axis-b",
                     }]
                 }
             }
