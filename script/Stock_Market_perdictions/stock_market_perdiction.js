@@ -24,6 +24,9 @@ window.addEventListener('DOMContentLoaded', function () {
         .then(rnn =>
             train_rnn(rnn)
         )
+        .then(rnn =>
+            perdict_rnn(rnn)
+        )
         .catch(error => {
             alert("Oops Something Went Wrong!" + error)
         });
@@ -226,7 +229,7 @@ let prep_data = function (stock_data) {
         console.log(Y_train.length);
         console.log(X_test.length);
         console.log(Y_test.length);*/
-        train_size  = X_train.length;
+        train_size = X_train.length;
         test_size = X_test.length;
 
 
@@ -259,20 +262,46 @@ let prep_data = function (stock_data) {
 let build_rnn = function (prepared_data) {
     return new Promise(function (resolve, reject) {
         try {
-            const model = tf.sequential();
-            console.log(prepared_data.train_size);
-            console.log(prepared_data.window_size);
-            model.add(tf.layers.lstm({ units: prepared_data.window_size, inputShape: [prepared_data.window_size] }));
-            model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
 
-            // Compile model to prepare for training.
-            const learningRate = 0.1;
-            const optimizer = tf.train.rmsprop(learningRate);
+            const learning_rate = 0.1;
+
+            const input_layer_shape = prepared_data.window_size;
+            const input_layer_neurons = 50;
+
+            const n_layers = 2;
+
+            const rnn_input_layer_features = 10;
+            const rnn_input_layer_timesteps = input_layer_neurons / rnn_input_layer_features;
+
+            const rnn_input_shape = [rnn_input_layer_features, rnn_input_layer_timesteps];
+            const rnn_output_neurons = 20;
+
+            const output_layer_shape = rnn_output_neurons;
+            const output_layer_neurons = 1;
+
+            const model = tf.sequential();
+
+            model.add(tf.layers.dense({ units: input_layer_neurons, inputShape: [input_layer_shape] }));
+            model.add(tf.layers.reshape({ targetShape: rnn_input_shape }));
+
+            let lstm_cells = [];
+            for (let index = 0; index < n_layers; index++) {
+                lstm_cells.push(tf.layers.lstmCell({ units: rnn_output_neurons }));
+            }
+
+            model.add(tf.layers.rnn({
+                cell: lstm_cells,
+                inputShape: rnn_input_shape,
+                returnSequences: false
+            }));
+
+            model.add(tf.layers.dense({ units: output_layer_neurons, inputShape: [output_layer_shape] }));
+
             model.compile({
-                loss: 'binaryCrossentropy',
-                optimizer: optimizer,
-                metrics: ['acc']
+                optimizer: tf.train.adam(learning_rate),
+                loss: 'meanSquaredError'
             });
+
 
             rnn = {
                 model: model,
@@ -302,23 +331,31 @@ let train_rnn = function (rnn) {
     return new Promise(async (resolve, reject) => {
 
         try {
-            rnn_x = tf.tensor(rnn.prepared_data.X_train);
-            rnn_y = tf.tensor(rnn.prepared_data.Y_train);
+            let X = prepared_data.X_train
+            let Y = prepared_data.Y_train;
 
+            const xs = tf.tensor2d(X, [X.length, X[0].length]);
+            const ys = tf.tensor2d(Y, [Y.length, 1]).reshape([Y.length, 1]);
+
+            
             const history = await rnn.model.fit(
-                rnn_x,
-                rnn_y, {
+                xs,
+                ys, {
                 batchSize: rnn.prepared_data.window_size,
                 epochs: 30
             })
 
             rnn.hist = history;
-            console.log(rnn);
+            //console.log(rnn);
             resolve(rnn);
         } catch (error) {
             reject(Error(error));
         }
     });
+};
+
+let perdict_rnn = function(rnn){
+
 };
 
 /**
