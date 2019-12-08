@@ -19,7 +19,10 @@ window.addEventListener('DOMContentLoaded', function () {
             prep_data(stock_info)
         )
         .then(stock_info =>
-            plot_stock_info(stock_info)
+            build_rnn(stock_info)
+        )
+        .then(rnn =>
+            train_rnn(rnn)
         )
         .catch(error => {
             alert("Oops Something Went Wrong!" + error)
@@ -171,11 +174,11 @@ let prep_data = function (stock_data) {
             // If all values in the list are the same then max and min are the same
             // so do not divide
             close_info_normalized = stock_info.close_info.map(function (x) {
-                return 1/stock_info.close_info.length;
+                return 1 / stock_info.close_info.length;
             });
         } else {
             close_info_normalized = stock_info.close_info.map(function (x) {
-                return (x-min)/(max-min);
+                return (x - min) / (max - min);
             });
         }
         //console.log(max);
@@ -187,33 +190,45 @@ let prep_data = function (stock_data) {
 
         window_size = 50;
         //console.log( stock_info.close_info.length % window_size);
-        if (stock_info.close_info.length % window_size != 0){
+        if (stock_info.close_info.length % window_size != 0) {
             reject("Window size of 50 is not divisble number of data points");
         }
         X = [];
         Y = [];
         x_window = [];
-        for(i = 0; i < stock_info.close_info.length - window_size; i++){
+        for (i = 0; i < stock_info.close_info.length - window_size; i++) {
             x_window = [];
+            curr_y = [];
             curr_avg = 0;
             t = i + window_size;
-            for(k = i; k < t && k < stock_info.close_info.length; k++){
+            for (k = i; k < t && k < stock_info.close_info.length; k++) {
                 curr_avg += stock_info.close_info[k];
                 x_window.push(stock_info.close_info[k]);
             }
-            curr_avg = curr_avg/window_size;
-            Y.push(curr_avg);
+            curr_avg = curr_avg / window_size;
+            curr_y.push(curr_avg);
+            Y.push(curr_y);
             X.push(x_window);
         }
 
         training_size = 70;
-        console.log(Math.floor(training_size / 100 * Y.length));
         X_train = X.slice(0, Math.floor(training_size / 100 * X.length));
         X_test = X.slice(Math.floor(training_size / 100 * X.length), X.length);
         Y_train = Y.slice(0, Math.floor(training_size / 100 * Y.length));
         Y_test = Y.slice(Math.floor(training_size / 100 * Y.length), Y.length);
         T_train = stock_data.time_info.slice(0, Math.floor(training_size / 100 * stock_data.time_info.length));
         T_test = stock_data.time_info.slice(Math.floor(training_size / 100 * stock_data.time_info.length), stock_data.time_info.length);
+        /*console.log(X_train);
+        console.log(X_test);
+        console.log(Y_train);
+        console.log(Y_test);
+        console.log(X_train.length);
+        console.log(Y_train.length);
+        console.log(X_test.length);
+        console.log(Y_test.length);*/
+        train_size  = X_train.length;
+        test_size = X_test.length;
+
 
         prepared_data = {
             original_data: stock_info.close_info,
@@ -223,8 +238,11 @@ let prep_data = function (stock_data) {
             Y_train: Y_train,
             X_test: X_test,
             Y_test: Y_test,
+            window_size: window_size,
+            train_size: train_size,
+            test_size: test_size,
             normalized_data: close_info_normalized,
-            time: stock_info.time_info
+            time: stock_info.time_info,
         };
 
         resolve(prepared_data);
@@ -232,10 +250,76 @@ let prep_data = function (stock_data) {
     });
 };
 
+/**
+ * 
+ * This function will build the RNN model.
+ * 
+ * @param {Object} prepared_data Data
+ */
+let build_rnn = function (prepared_data) {
+    return new Promise(function (resolve, reject) {
+        try {
+            const model = tf.sequential();
+            console.log(prepared_data.train_size);
+            console.log(prepared_data.window_size);
+            model.add(tf.layers.lstm({ units: prepared_data.window_size, inputShape: [prepared_data.window_size] }));
+            model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
 
-let rnn = function(prepared_data){
+            // Compile model to prepare for training.
+            const learningRate = 0.1;
+            const optimizer = tf.train.rmsprop(learningRate);
+            model.compile({
+                loss: 'binaryCrossentropy',
+                optimizer: optimizer,
+                metrics: ['acc']
+            });
 
-}
+            rnn = {
+                model: model,
+                prepared_data: prepared_data
+            };
+            resolve(rnn);
+        } catch (error) {
+            reject(Error(error));
+        }
+
+
+    });
+
+
+};
+
+/**
+ * 
+ * This function will train the rnn.
+ * 
+ * TODO: having a await in a promise might cause problems with error proegation
+ * so I need to fix it.
+ * 
+ * @param {Object} rnn Contains data and model
+ */
+let train_rnn = function (rnn) {
+    return new Promise(async (resolve, reject) => {
+
+        try {
+            rnn_x = tf.tensor(rnn.prepared_data.X_train);
+            rnn_y = tf.tensor(rnn.prepared_data.Y_train);
+
+            const history = await rnn.model.fit(
+                rnn_x,
+                rnn_y, {
+                batchSize: rnn.prepared_data.window_size,
+                epochs: 30
+            })
+
+            rnn.hist = history;
+            console.log(rnn);
+            resolve(rnn);
+        } catch (error) {
+            reject(Error(error));
+        }
+    });
+};
 
 /**
  * 
