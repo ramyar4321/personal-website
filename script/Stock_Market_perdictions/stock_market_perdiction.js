@@ -206,11 +206,21 @@ let prep_data = function (stock_data) {
             X.push(x_window);
         }
 
+        training_size = 70;
+        console.log(Math.floor(training_size / 100 * Y.length));
+        X_train = X.slice(0, Math.floor(training_size / 100 * X.length));
+        X_test = X.slice(Math.floor(training_size / 100 * X.length), X.length);
+        Y_train = Y.slice(0, Math.floor(training_size / 100 * Y.length));
+        Y_test = Y.slice(Math.floor(training_size / 100 * Y.length), Y.length);
 
         prepared_data = {
             original_data: stock_info.close_info,
             X: X,
             Y: Y,
+            X_train: X_train,
+            Y_train: Y_train,
+            X_test: X_test,
+            Y_test: Y_test,
             normalized_data: close_info_normalized,
             time: stock_info.time_info
         };
@@ -237,12 +247,10 @@ let plot_stock_info = function (stock_info) {
         var canvas = document.getElementById("open_stock_info");
         var context = canvas.getContext('2d');
 
-        console.log(stock_info.time_info);
-        console.log(stock_info.open_info);
-        console.log(stock_info.high_info);
-        console.log(stock_info.low_info);
-        console.log(stock_info.close_info);
-        console.log(stock_info.volume_info);
+        console.log(prepared_data.original_data);
+        console.log(prepared_data.Y_train);
+        console.log(prepared_data.Y_test);
+        console.log(prepared_data.normalized_data);
 
         var myChart = new Chart(context, {
             type: 'bar',
@@ -274,7 +282,7 @@ let plot_stock_info = function (stock_info) {
                     },
                     {
                         type: 'line',
-                        label: "RollingAverage",
+                        label: "RollingAverageTrain",
                         fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
