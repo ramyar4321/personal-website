@@ -212,6 +212,8 @@ let prep_data = function (stock_data) {
         X_test = X.slice(Math.floor(training_size / 100 * X.length), X.length);
         Y_train = Y.slice(0, Math.floor(training_size / 100 * Y.length));
         Y_test = Y.slice(Math.floor(training_size / 100 * Y.length), Y.length);
+        T_train = stock_data.time_info.slice(0, Math.floor(training_size / 100 * stock_data.time_info.length));
+        T_test = stock_data.time_info.slice(Math.floor(training_size / 100 * stock_data.time_info.length), stock_data.time_info.length);
 
         prepared_data = {
             original_data: stock_info.close_info,
@@ -230,6 +232,11 @@ let prep_data = function (stock_data) {
     });
 };
 
+
+let rnn = function(prepared_data){
+
+}
+
 /**
  * 
  * @param {Object} stock_info Contains time and stock value for:
@@ -240,17 +247,12 @@ let prep_data = function (stock_data) {
  *                                  - Close prices
  *                                  - Volume prices
  */
-let plot_stock_info = function (stock_info) {
+let plot_stock_info = function (prepared_data) {
     return new Promise(function (resolve, reject) {
 
 
         var canvas = document.getElementById("open_stock_info");
         var context = canvas.getContext('2d');
-
-        console.log(prepared_data.original_data);
-        console.log(prepared_data.Y_train);
-        console.log(prepared_data.Y_test);
-        console.log(prepared_data.normalized_data);
 
         var myChart = new Chart(context, {
             type: 'bar',
