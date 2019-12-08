@@ -16,6 +16,9 @@ window.addEventListener('DOMContentLoaded', function () {
             data_cleaning(stock_info)
         )
         .then(stock_info =>
+            prep_data(stock_info)
+        )
+        .then(stock_info =>
             plot_stock_info(stock_info)
         )
         .catch(error => {
@@ -136,6 +139,89 @@ let data_cleaning = function (stock_info) {
 
 /**
  * 
+ * This function will promise to prepare the data to be used in ML.
+ * It will do the following:
+ *      1. Decrease the size of the dataset to 3000 datapoints 
+ *      2. Convert strings to floating values for a given stock data field.
+ *      3. Normalize the closing and rolling average data
+ *      4. Compute the rolling averages for stock data field, in this case closing data
+ *      5. Split the data into training and test data
+ * Resolve will return closing, rolling averages, and time data.
+ * @param {Object} data 
+ */
+let prep_data = function (stock_data) {
+
+    return new Promise(function (resolve, reject) {
+        slice_start_position = 3000;
+        if (slice_start_position < stock_data.close_info.length) {
+            stock_data.close_info = stock_data.close_info.slice(0, slice_start_position);
+            stock_data.time_info = stock_data.time_info.slice(0, slice_start_position);
+        } else {
+            reject("Dataset contains less than 3000 data points.");
+        }
+
+        stock_data.close_info = stock_data.close_info.map(close_info => {
+            return parseFloat(close_info)
+        });
+
+
+        max = Math.max(...stock_info.close_info);
+        min = Math.min(...stock_info.close_info);
+        if (max - min == 0) {
+            // If all values in the list are the same then max and min are the same
+            // so do not divide
+            close_info_normalized = stock_info.close_info.map(function (x) {
+                return 1/stock_info.close_info.length;
+            });
+        } else {
+            close_info_normalized = stock_info.close_info.map(function (x) {
+                return (x-min)/(max-min);
+            });
+        }
+        //console.log(max);
+        //console.log(min);
+        //console.log(stock_info.close_info);
+        //console.log(close_info_normalized);
+
+
+
+        window_size = 50;
+        //console.log( stock_info.close_info.length % window_size);
+        if (stock_info.close_info.length % window_size != 0){
+            reject("Window size of 50 is not divisble number of data points");
+        }
+        X = [];
+        Y = [];
+        x_window = [];
+        for(i = 0; i < stock_info.close_info.length - window_size; i++){
+            x_window = [];
+            curr_avg = 0;
+            t = i + window_size;
+            for(k = i; k < t && k < stock_info.close_info.length; k++){
+                curr_avg += stock_info.close_info[k];
+                x_window.push(stock_info.close_info[k]);
+            }
+            curr_avg = curr_avg/window_size;
+            Y.push(curr_avg);
+            X.push(x_window);
+        }
+
+
+        prepared_data = {
+            original_data: stock_info.close_info,
+            X: X,
+            Y: Y,
+            normalized_data: close_info_normalized,
+            time: stock_info.time_info
+        };
+
+        resolve(prepared_data);
+
+    });
+};
+
+/**
+ * 
  * @param {Object} stock_info Contains time and stock value for:
  *                                  - Dates 
  *                                  - Opening prices
@@ -161,11 +247,12 @@ let plot_stock_info = function (stock_info) {
         var myChart = new Chart(context, {
             type: 'bar',
             data: data = {
-                labels: stock_info.time_info,
+                labels: prepared_data.time,
                 datasets: [
                     {
                         type: 'line',
-                        label: "Open",
+                        label: "Close",
+                        fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
                         backgroundColor: 'rgb(75, 214, 238)',
@@ -181,13 +268,13 @@ let plot_stock_info = function (stock_info) {
                         pointHoverBackgroundColor: 'rgb(75, 214, 238)',
                         pointHoverBorderColor: 'rgb(75, 214, 238)',
                         pointHoverBorderWidth: 3,
-                        pointRadius: 5,
+                        pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: stock_info.open_info,
+                        data: prepared_data.original_data,
                     },
                     {
                         type: 'line',
-                        label: "High",
+                        label: "RollingAverage",
                         fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
@@ -204,15 +291,15 @@ let plot_stock_info = function (stock_info) {
                         pointHoverBackgroundColor: 'rgb(210, 221, 72)',
                         pointHoverBorderColor: 'rgb(210, 221, 72)',
                         pointHoverBorderWidth: 3,
-                        pointRadius: 5,
+                        pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: stock_info.high_info,
+                        data: prepared_data.Y,
                     },
                     {
                         type: 'line',
-                        label: "Low",
+                        label: "NormalizedData",
                         fill: false,
-                        yAxisID: 'y-axis-a',
+                        yAxisID: 'y-axis-b',
                         lineTension: 0.1,
                         backgroundColor: 'rgb(238, 79, 75)',
                         borderColor: 'rgb(238, 79, 75)',
@@ -227,48 +314,10 @@ let plot_stock_info = function (stock_info) {
                         pointHoverBackgroundColor: 'rgb(238, 79, 75)',
                         pointHoverBorderColor: 'rgb(238, 79, 75)',
                         pointHoverBorderWidth: 3,
-                        pointRadius: 5,
+                        pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: stock_info.low_info,
-                    },
-                    {
-                        type: 'line',
-                        label: "Close",
-                        fill: false,
-                        yAxisID: 'y-axis-a',
-                        lineTension: 0.1,
-                        backgroundColor: 'rgb(28, 175, 154)',
-                        borderColor: 'rgb(28, 175, 154)',
-                        borderCapStyle: 'butt',
-                        borderDash: [],
-                        borderDashOffset: 0.0,
-                        borderJoinStyle: 'miter',
-                        pointBorderColor: 'rgb(28, 175, 154)',
-                        pointBackgroundColor: 'rgb(28, 175, 154)',
-                        pointBorderWidth: 1,
-                        pointHoverRadius: 4,
-                        pointHoverBackgroundColor: 'rgb(28, 175, 154)',
-                        pointHoverBorderColor: 'rgb(28, 175, 154)',
-                        pointHoverBorderWidth: 3,
-                        pointRadius: 5,
-                        pointHitRadius: 10,
-                        data: stock_info.close_info,
-                    },
-                    {
-                        type: 'line',
-                        label: 'Volume', //1D2939
-                        yAxisID: 'y-axis-b',
-                        barPercentage: '1',
-                        categoryPercentage: '1',
-                        backgroundColor: 'rgb(29, 41, 57)',
-                        borderColor: 'rgb(29, 41, 57)',
-                        borderWidth: '1',
-                        borderSkipped: 'bottom',
-                        hoverBackgroundColor: 'rgb(29, 41, 57)',
-                        hoverBorderColor: 'rgb(29, 41, 57)',
-                        hoverBorderWidth: '3',
-                        data: stock_info.volume_info
-                    },
+                        data: prepared_data.normalized_data,
+                    }
                 ]
             },
             options: {
@@ -298,6 +347,8 @@ let plot_stock_info = function (stock_info) {
                 }
             }
         });
+
+
         resolve();
     });
 };
