@@ -21,12 +21,12 @@ window.addEventListener('DOMContentLoaded', function () {
         .then(stock_info =>
             build_rnn(stock_info)
         )
-        .then(rnn =>
+        /*.then(rnn =>
             train_rnn(rnn)
         )
         .then(rnn =>
             perdict_rnn(rnn)
-        )
+        )*/
         .then(stock_info =>
             plot_stock_info(stock_info)
         )
@@ -191,21 +191,21 @@ let prep_data = function (stock_data) {
 
 
         window_size = 50;
-        //console.log( stock_info.close_info.length % window_size);
-        if (stock_info.close_info.length % window_size != 0) {
+        //console.log( close_info_normalized.length % window_size);
+        if (close_info_normalized.length % window_size != 0) {
             reject("Window size of 50 is not divisble number of data points");
         }
         X = [];
         Y = [];
         x_window = [];
-        for (i = 0; i < stock_info.close_info.length - window_size; i++) {
+        for (i = 0; i < close_info_normalized.length - window_size; i++) {
             x_window = [];
             //curr_y = [];
             curr_avg = 0;
             t = i + window_size;
-            for (k = i; k < t && k < stock_info.close_info.length; k++) {
-                curr_avg += stock_info.close_info[k];
-                x_window.push(stock_info.close_info[k]);
+            for (k = i; k < t && k < close_info_normalized.length; k++) {
+                curr_avg += close_info_normalized[k];
+                x_window.push(close_info_normalized[k]);
             }
             curr_avg = curr_avg / window_size;
             Y.push(curr_avg);
@@ -240,7 +240,7 @@ let prep_data = function (stock_data) {
             window_size: window_size,
             train_size: train_size,
             test_size: test_size,
-            normalized_data: close_info_normalized,
+            //normalized_data: close_info_normalized,
             time: stock_info.time_info,
 
         };
@@ -260,7 +260,7 @@ let build_rnn = function (prepared_data) {
     return new Promise(function (resolve, reject) {
         try {
 
-            const learning_rate = 0.1;
+            const learning_rate = 0.01;
 
             const input_layer_shape = prepared_data.window_size;
             const input_layer_neurons = 50;
@@ -348,7 +348,7 @@ let train_rnn = function (rnn) {
 
                 rnn.hist = history;
 
-                await rnn.model.save('localstorage://my-model');
+                //await rnn.model.save('localstorage://my-model');
             }
 
             //console.log(rnn);
@@ -371,20 +371,13 @@ let perdict_rnn = function (rnn) {
 
             Y_pred = rnn.model.predict(tf.tensor2d(rnn.prepared_data.X_test, [rnn.prepared_data.X_test.length,
             rnn.prepared_data.X_test[0].length]));
-            console.log(Y_pred);
 
             max = Math.max(...rnn.prepared_data.original_data);
-            min = Math.min(...rnn.prepared_data.original_data);
-
+            max = Math.min(...rnn.prepared_data.original_data);
 
             Y_pred = Y_pred.mul(max - min).add(min);
-            /*Y_pred = Y_pred.map(function (y) {
-                return y * (max - min) + min;
-            });*/
 
-            console.log(Y_pred);
-
-            rnn.prepared_data.Y_pred = Y_pred.dataSync();
+            rnn.prepared_data.Y_pred = Array.from(Y_pred.dataSync());
             resolve(rnn);
         } catch (error) {
             reject(error);
@@ -408,26 +401,15 @@ let plot_stock_info = function (knn) {
 
         var canvas = document.getElementById("open_stock_info");
         var context = canvas.getContext('2d');
-        //console.log(prepared_data.original_data);
-        //console.log(prepared_data.time);
+    
 
-        //original_data = Object.assign(...prepared_data.time.map((k, i) => ({[k]: [prepared_data.original_data[i]]})));
-
-        /*original_data_train = [];
-        for(i = 0; i < prepared_data.T_train.length; i++){
-            data = {};
-            data.x = prepared_data.T_train[i];
-            data.y = prepared_data.Original_data_train[i];
-            original_data_train.push(data);
-        }
-
-        original_data_test = [];
+        actual_values = [];
         for(i = 0; i < prepared_data.T_test.length; i++){
             data = {};
-            data.x = prepared_data.T_test[i];
-            data.y = prepared_data.Original_data_test[i];
-            original_data_test.push(data);
-        }*/
+            data.x = knn.prepared_data.T_train[i];
+            data.y = knn.prepared_data.Original_data_train[i];
+            actual_values.push(data);
+        }
         perdicted_values = [];
         for (i = 0; i < knn.prepared_data.T_test.length; i++) {
             data = {};
@@ -462,26 +444,26 @@ let plot_stock_info = function (knn) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: knn.prepared_data.close_info,
+                        data: knn.prepared_data.original_data,
                     },
                     {
                         type: 'line',
-                        label: "Perdicted values",
+                        label: "Rolling Averages Actual Values",
                         fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
                         backgroundColor: 'rgb(100, 250, 98)',
-                        borderColor: 'rgb(75, 214, 238)',
+                        borderColor: 'rgb(100, 250, 98)',
                         borderCapStyle: 'butt',
                         borderDash: [],
                         borderDashOffset: 0.0,
                         borderJoinStyle: 'miter',
-                        pointBorderColor: 'rgb(75, 214, 238)',
-                        pointBackgroundColor: 'rgb(75, 214, 238)',
+                        pointBorderColor: 'rgb(100, 250, 98)',
+                        pointBackgroundColor: 'rgb(100, 250, 98)',
                         pointBorderWidth: 1,
                         pointHoverRadius: 4,
-                        pointHoverBackgroundColor: 'rgb(75, 214, 238)',
-                        pointHoverBorderColor: 'rgb(75, 214, 238)',
+                        pointHoverBackgroundColor: 'rgb(100, 250, 98)',
+                        pointHoverBorderColor: 'rgb(100, 250, 98)',
                         pointHoverBorderWidth: 3,
                         pointRadius: 0.2,
                         pointHitRadius: 10,
@@ -489,7 +471,7 @@ let plot_stock_info = function (knn) {
                     },
                     {
                         type: 'line',
-                        label: "RollingAverageTrain",
+                        label: "Rolling Averages Actual Values",
                         fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
@@ -508,30 +490,7 @@ let plot_stock_info = function (knn) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: knn.prepared_data.Y,
-                    },
-                    {
-                        type: 'line',
-                        label: "NormalizedData",
-                        fill: false,
-                        yAxisID: 'y-axis-b',
-                        lineTension: 0.1,
-                        backgroundColor: 'rgb(238, 79, 75)',
-                        borderColor: 'rgb(238, 79, 75)',
-                        borderCapStyle: 'butt',
-                        borderDash: [],
-                        borderDashOffset: 0.0,
-                        borderJoinStyle: 'miter',
-                        pointBorderColor: 'rgb(238, 79, 75)',
-                        pointBackgroundColor: 'rgb(238, 79, 75)',
-                        pointBorderWidth: 1,
-                        pointHoverRadius: 4,
-                        pointHoverBackgroundColor: 'rgb(238, 79, 75)',
-                        pointHoverBorderColor: 'rgb(238, 79, 75)',
-                        pointHoverBorderWidth: 3,
-                        pointRadius: 0.2,
-                        pointHitRadius: 10,
-                        data: knn.prepared_data.normalized_data,
+                        data: actual_values,
                     }
                 ]
             },
@@ -555,9 +514,6 @@ let plot_stock_info = function (knn) {
                     yAxes: [{
                         position: "left",
                         id: "y-axis-a",
-                    }, {
-                        position: "right",
-                        id: "y-axis-b",
                     }]
                 }
             }
