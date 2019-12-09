@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', function () {
         .then(stock_info =>
             prep_data(stock_info)
         )
-        /*.then(stock_info =>
+        .then(stock_info =>
             build_rnn(stock_info)
         )
         .then(rnn =>
@@ -26,7 +26,7 @@ window.addEventListener('DOMContentLoaded', function () {
         )
         .then(rnn =>
             perdict_rnn(rnn)
-        )*/
+        )
         .then(stock_info =>
             plot_stock_info(stock_info)
         )
@@ -187,10 +187,6 @@ let prep_data = function (stock_data) {
                 return (x - min) / (max - min);
             });
         }
-        //console.log(max);
-        //console.log(min);
-        //console.log(stock_info.close_info);
-        //console.log(close_info_normalized);
 
 
 
@@ -225,14 +221,6 @@ let prep_data = function (stock_data) {
         T_test = stock_data.time_info.slice(Math.floor(training_size / 100 * stock_data.time_info.length), stock_data.time_info.length);
         Original_data_train = stock_data.close_info.slice(0, Math.floor(training_size / 100 * stock_data.close_info.length));
         Original_data_test = stock_data.close_info.slice(Math.floor(training_size / 100 * stock_data.close_info.length), stock_data.time_info.length);
-        /*console.log(X_train);
-        console.log(X_test);
-        console.log(Y_train);
-        console.log(Y_test);
-        console.log(X_train.length);
-        console.log(Y_train.length);
-        console.log(X_test.length);
-        console.log(Y_test.length);*/
         train_size = X_train.length;
         test_size = X_test.length;
 
@@ -240,7 +228,7 @@ let prep_data = function (stock_data) {
         prepared_data = {
             original_data: stock_info.close_info,
             Original_data_train: Original_data_train,
-            Original_data_test: Original_data_test, 
+            Original_data_test: Original_data_test,
             X: X,
             Y: Y,
             X_train: X_train,
@@ -254,7 +242,7 @@ let prep_data = function (stock_data) {
             test_size: test_size,
             normalized_data: close_info_normalized,
             time: stock_info.time_info,
-            
+
         };
 
         resolve(prepared_data);
@@ -340,21 +328,29 @@ let train_rnn = function (rnn) {
     return new Promise(async (resolve, reject) => {
 
         try {
-            let X = prepared_data.X_train
-            let Y = prepared_data.Y_train;
+            shouldLoad = 0;
+            if (shouldLoad == 1) {
+                rnn.model = await tf.loadLayersModel('localstorage://my-model');
+            } else {
+                let X = rnn.prepared_data.X_train
+                let Y = rnn.prepared_data.Y_train;
 
-            const xs = tf.tensor2d(X, [X.length, X[0].length]);
-            const ys = tf.tensor2d(Y, [Y.length, 1]).reshape([Y.length, 1]);
+                const xs = tf.tensor2d(X, [X.length, X[0].length]);
+                const ys = tf.tensor2d(Y, [Y.length, 1]).reshape([Y.length, 1]);
 
 
-            const history = await rnn.model.fit(
-                xs,
-                ys, {
-                batchSize: rnn.prepared_data.window_size,
-                epochs: 30
-            })
+                const history = await rnn.model.fit(
+                    xs,
+                    ys, {
+                    batchSize: rnn.prepared_data.window_size,
+                    epochs: 30
+                })
 
-            rnn.hist = history;
+                rnn.hist = history;
+
+                await rnn.model.save('localstorage://my-model');
+            }
+
             //console.log(rnn);
             resolve(rnn);
         } catch (error) {
@@ -363,8 +359,37 @@ let train_rnn = function (rnn) {
     });
 };
 
+/**
+ * 
+ * This function will use the trained model to perdict y values given test x.
+ * 
+ * @param {Object} rnn Contains data and model
+ */
 let perdict_rnn = function (rnn) {
+    return new Promise(function (resolve, reject) {
+        try {
 
+            Y_pred = rnn.model.predict(tf.tensor2d(rnn.prepared_data.X_test, [rnn.prepared_data.X_test.length,
+            rnn.prepared_data.X_test[0].length]));
+            console.log(Y_pred);
+
+            max = Math.max(...rnn.prepared_data.original_data);
+            min = Math.min(...rnn.prepared_data.original_data);
+
+
+            Y_pred = Y_pred.mul(max - min).add(min);
+            /*Y_pred = Y_pred.map(function (y) {
+                return y * (max - min) + min;
+            });*/
+
+            console.log(Y_pred);
+
+            rnn.prepared_data.Y_pred = Y_pred.dataSync();
+            resolve(rnn);
+        } catch (error) {
+            reject(error);
+        }
+    });
 };
 
 /**
@@ -377,7 +402,7 @@ let perdict_rnn = function (rnn) {
  *                                  - Close prices
  *                                  - Volume prices
  */
-let plot_stock_info = function (prepared_data) {
+let plot_stock_info = function (knn) {
     return new Promise(function (resolve, reject) {
 
 
@@ -388,7 +413,7 @@ let plot_stock_info = function (prepared_data) {
 
         //original_data = Object.assign(...prepared_data.time.map((k, i) => ({[k]: [prepared_data.original_data[i]]})));
 
-        original_data_train = [];
+        /*original_data_train = [];
         for(i = 0; i < prepared_data.T_train.length; i++){
             data = {};
             data.x = prepared_data.T_train[i];
@@ -402,6 +427,13 @@ let plot_stock_info = function (prepared_data) {
             data.x = prepared_data.T_test[i];
             data.y = prepared_data.Original_data_test[i];
             original_data_test.push(data);
+        }*/
+        perdicted_values = [];
+        for (i = 0; i < knn.prepared_data.T_test.length; i++) {
+            data = {};
+            data.x = knn.prepared_data.T_test[i];
+            data.y = knn.prepared_data.Y_pred[i];
+            perdicted_values.push(data);
         }
         //console.log(original_data_train);
         var myChart = new Chart(context, {
@@ -411,7 +443,7 @@ let plot_stock_info = function (prepared_data) {
                 datasets: [
                     {
                         type: 'line',
-                        label: "Close Traning Set",
+                        label: "Close Info",
                         fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
@@ -430,30 +462,30 @@ let plot_stock_info = function (prepared_data) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: original_data_train,
+                        data: knn.prepared_data.close_info,
                     },
                     {
                         type: 'line',
-                        label: "Close Test Set",
+                        label: "Perdicted values",
                         fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
-                        backgroundColor: 'rgb(100, 250, 200)',
-                        borderColor: 'rgb(100, 250, 200)',
+                        backgroundColor: 'rgb(100, 250, 98)',
+                        borderColor: 'rgb(75, 214, 238)',
                         borderCapStyle: 'butt',
                         borderDash: [],
                         borderDashOffset: 0.0,
                         borderJoinStyle: 'miter',
-                        pointBorderColor: 'rgb(100, 250, 200)',
-                        pointBackgroundColor: 'rgb(100, 250, 200)',
+                        pointBorderColor: 'rgb(75, 214, 238)',
+                        pointBackgroundColor: 'rgb(75, 214, 238)',
                         pointBorderWidth: 1,
                         pointHoverRadius: 4,
-                        pointHoverBackgroundColor: 'rgb(100, 250, 200)',
-                        pointHoverBorderColor: 'rgb(100, 250, 200)',
+                        pointHoverBackgroundColor: 'rgb(75, 214, 238)',
+                        pointHoverBorderColor: 'rgb(75, 214, 238)',
                         pointHoverBorderWidth: 3,
                         pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: original_data_test,
+                        data: perdicted_values,
                     },
                     {
                         type: 'line',
@@ -476,7 +508,7 @@ let plot_stock_info = function (prepared_data) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: prepared_data.Y,
+                        data: knn.prepared_data.Y,
                     },
                     {
                         type: 'line',
@@ -499,7 +531,7 @@ let plot_stock_info = function (prepared_data) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: prepared_data.normalized_data,
+                        data: knn.prepared_data.normalized_data,
                     }
                 ]
             },
@@ -530,7 +562,7 @@ let plot_stock_info = function (prepared_data) {
                 }
             }
         });
-        
+
 
         resolve();
     });
