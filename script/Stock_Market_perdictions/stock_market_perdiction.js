@@ -375,55 +375,123 @@ let plot_stock_info = function (prepared_data) {
 
 
         var canvas = document.getElementById("open_stock_info");
-        //var context = canvas.getContext('2d');
-        console.log(prepared_data.original_data);
-        console.log(prepared_data.time);
+        var context = canvas.getContext('2d');
+        //console.log(prepared_data.original_data);
+        //console.log(prepared_data.time);
 
-        var trace1 = {
-            x: prepared_data.time,
-            y: prepared_data.normalized_data,
-            name: 'yaxis2 data',
-            xaxis: 'x',
-            yaxis: "y",
-            type: 'scatter'
-        };
+        //original_data = Object.assign(...prepared_data.time.map((k, i) => ({[k]: [prepared_data.original_data[i]]})));
 
-        var trace2 = {
-            x: prepared_data.time,
-            y: prepared_data.original_data,
-            name: 'yaxis data',
-            xaxis: 'x',
-            yaxis: "y2",
-            type: 'scatter',
-        };
-
-        var trace3 = {
-            x: prepared_data.time,
-            y: prepared_data.Y,
-            name: 'yaxis1 data',
-            xaxis: 'x',
-            yaxis: "y",
-            type: 'scatter'
-        };
-
-        var data = [trace1, trace2, trace3];
-
-        var layout = {
-            title: 'Double Y Axis Example',
-            xaxis: {title: 'something'},
-            yaxis: {
-                title: 'yaxis title'
+        original_data = [];
+        for(i = 0; i < prepared_data.time.length; i++){
+            data = {};
+            data.x = prepared_data.time[i];
+            data.y = prepared_data.original_data[i];
+            original_data.push(data);
+        }
+        console.log(original_data);
+        var myChart = new Chart(context, {
+            type: 'bar',
+            data: data = {
+                labels: prepared_data.time,
+                datasets: [
+                    {
+                        type: 'line',
+                        label: "Close",
+                        fill: false,
+                        yAxisID: 'y-axis-a',
+                        lineTension: 0.1,
+                        backgroundColor: 'rgb(75, 214, 238)',
+                        borderColor: 'rgb(75, 214, 238)',
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: 'rgb(75, 214, 238)',
+                        pointBackgroundColor: 'rgb(75, 214, 238)',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: 'rgb(75, 214, 238)',
+                        pointHoverBorderColor: 'rgb(75, 214, 238)',
+                        pointHoverBorderWidth: 3,
+                        pointRadius: 0.2,
+                        pointHitRadius: 10,
+                        data: original_data,
+                    },
+                    {
+                        type: 'line',
+                        label: "RollingAverageTrain",
+                        fill: false,
+                        yAxisID: 'y-axis-a',
+                        lineTension: 0.1,
+                        backgroundColor: 'rgb(210, 221, 72)',
+                        borderColor: 'rgb(210, 221, 72)',
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: 'rgb(210, 221, 72)',
+                        pointBackgroundColor: 'rgb(210, 221, 72)',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: 'rgb(210, 221, 72)',
+                        pointHoverBorderColor: 'rgb(210, 221, 72)',
+                        pointHoverBorderWidth: 3,
+                        pointRadius: 0.2,
+                        pointHitRadius: 10,
+                        data: prepared_data.Y,
+                    },
+                    {
+                        type: 'line',
+                        label: "NormalizedData",
+                        fill: false,
+                        yAxisID: 'y-axis-b',
+                        lineTension: 0.1,
+                        backgroundColor: 'rgb(238, 79, 75)',
+                        borderColor: 'rgb(238, 79, 75)',
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: 'rgb(238, 79, 75)',
+                        pointBackgroundColor: 'rgb(238, 79, 75)',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: 'rgb(238, 79, 75)',
+                        pointHoverBorderColor: 'rgb(238, 79, 75)',
+                        pointHoverBorderWidth: 3,
+                        pointRadius: 0.2,
+                        pointHitRadius: 10,
+                        data: prepared_data.normalized_data,
+                    }
+                ]
             },
-            yaxis2: {
-                title: 'yaxis2 title',
-                titlefont: { color: 'rgb(148, 103, 189)' },
-                tickfont: { color: 'rgb(148, 103, 189)' },
-                overlaying: 'y',
-                side: 'right'
+            options: {
+                title: {
+                    display: true,
+                    text: 'Share Price - Past 7 Days',
+                    fontSize: '20',
+                    fontFamily: 'Open Sans, sans-serif',
+                    // fontColor
+                    // fontStyle
+                    // padding
+                    // lineHeight
+                },
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            min: 0
+                        }
+                    }],
+                    yAxes: [{
+                        position: "left",
+                        id: "y-axis-a",
+                    }, {
+                        position: "right",
+                        id: "y-axis-b",
+                    }]
+                }
             }
-        };
-
-        Plotly.newPlot(canvas, data, layout);
+        });
         
 
         resolve();
