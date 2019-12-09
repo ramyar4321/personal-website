@@ -223,6 +223,8 @@ let prep_data = function (stock_data) {
         Y_test = Y.slice(Math.floor(training_size / 100 * Y.length), Y.length);
         T_train = stock_data.time_info.slice(0, Math.floor(training_size / 100 * stock_data.time_info.length));
         T_test = stock_data.time_info.slice(Math.floor(training_size / 100 * stock_data.time_info.length), stock_data.time_info.length);
+        Original_data_train = stock_data.close_info.slice(0, Math.floor(training_size / 100 * stock_data.close_info.length));
+        Original_data_test = stock_data.close_info.slice(Math.floor(training_size / 100 * stock_data.close_info.length), stock_data.time_info.length);
         /*console.log(X_train);
         console.log(X_test);
         console.log(Y_train);
@@ -237,17 +239,22 @@ let prep_data = function (stock_data) {
 
         prepared_data = {
             original_data: stock_info.close_info,
+            Original_data_train: Original_data_train,
+            Original_data_test: Original_data_test, 
             X: X,
             Y: Y,
             X_train: X_train,
             Y_train: Y_train,
             X_test: X_test,
             Y_test: Y_test,
+            T_train: T_train,
+            T_test: T_test,
             window_size: window_size,
             train_size: train_size,
             test_size: test_size,
             normalized_data: close_info_normalized,
             time: stock_info.time_info,
+            
         };
 
         resolve(prepared_data);
@@ -381,14 +388,22 @@ let plot_stock_info = function (prepared_data) {
 
         //original_data = Object.assign(...prepared_data.time.map((k, i) => ({[k]: [prepared_data.original_data[i]]})));
 
-        original_data = [];
-        for(i = 0; i < prepared_data.time.length; i++){
+        original_data_train = [];
+        for(i = 0; i < prepared_data.T_train.length; i++){
             data = {};
-            data.x = prepared_data.time[i];
-            data.y = prepared_data.original_data[i];
-            original_data.push(data);
+            data.x = prepared_data.T_train[i];
+            data.y = prepared_data.Original_data_train[i];
+            original_data_train.push(data);
         }
-        console.log(original_data);
+
+        original_data_test = [];
+        for(i = 0; i < prepared_data.T_test.length; i++){
+            data = {};
+            data.x = prepared_data.T_test[i];
+            data.y = prepared_data.Original_data_test[i];
+            original_data_test.push(data);
+        }
+        //console.log(original_data_train);
         var myChart = new Chart(context, {
             type: 'bar',
             data: data = {
@@ -396,7 +411,7 @@ let plot_stock_info = function (prepared_data) {
                 datasets: [
                     {
                         type: 'line',
-                        label: "Close",
+                        label: "Close Traning Set",
                         fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
@@ -415,7 +430,30 @@ let plot_stock_info = function (prepared_data) {
                         pointHoverBorderWidth: 3,
                         pointRadius: 0.2,
                         pointHitRadius: 10,
-                        data: original_data,
+                        data: original_data_train,
+                    },
+                    {
+                        type: 'line',
+                        label: "Close Test Set",
+                        fill: false,
+                        yAxisID: 'y-axis-a',
+                        lineTension: 0.1,
+                        backgroundColor: 'rgb(100, 250, 200)',
+                        borderColor: 'rgb(100, 250, 200)',
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: 'rgb(100, 250, 200)',
+                        pointBackgroundColor: 'rgb(100, 250, 200)',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: 'rgb(100, 250, 200)',
+                        pointHoverBorderColor: 'rgb(100, 250, 200)',
+                        pointHoverBorderWidth: 3,
+                        pointRadius: 0.2,
+                        pointHitRadius: 10,
+                        data: original_data_test,
                     },
                     {
                         type: 'line',
