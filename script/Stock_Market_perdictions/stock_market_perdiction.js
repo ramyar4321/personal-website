@@ -1,15 +1,14 @@
 window.addEventListener('DOMContentLoaded', function () {
 
-    var stock_market_perdiction = document.getElementById("stock-market-perdiction-button");
+    this.stock_market_perdiction_button = document.getElementById("stock-market-perdiction-button");
 
     this.loadingElement = document.getElementById("loading-gif");
-    loadingElement.style.display = 'none'; 
+    loadingElement.style.display = 'none';
 
     this.canvas = document.getElementById("stock-market-graph");
     this.context = canvas.getContext('2d');
 
-    this.canvas.width = 500;
-    this.canvas.height = 200;
+    plot_data([],[]);
 
     time_series = "function=TIME_SERIES_DAILY";
     symbol = "symbol=MSFT";
@@ -19,9 +18,12 @@ window.addEventListener('DOMContentLoaded', function () {
     // https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&outputsize=full&apikey=demo
     url = "https://www.alphavantage.co/query?" + time_series + "&" + symbol + "&" + outputsize + "&" + apikey;
 
-    stock_market_perdiction.addEventListener("click", function () {
-        //loadingElement.appendChild(loading);   
-        getStockData(url)
+    stock_market_perdiction_button.addEventListener("click", function () {
+
+        intialize_HTML_Elements()
+            .then(() =>
+                getStockData(url)
+            )
             .then(responseText =>
                 parseStockData(responseText)
             )
@@ -43,14 +45,40 @@ window.addEventListener('DOMContentLoaded', function () {
             .then(stock_info =>
                 plot_stock_info(stock_info)
             )
+            .then(()=>
+                finalize_HTML_Elements()
+            )
             .catch(error => {
                 alert("Oops Something Went Wrong!" + error)
             });
-        setTimeout(function () {}, 5000);
-        //loadingElement.removeChild(loading.lastChild);
-        //loadingElement.style.display = 'none';
     });
 });
+
+/**
+ * 
+ * This function will intialize HTML elements:
+ *      1. The button that the user will press to start stock market perdiction
+ *         will be disabled so that the user does not click on it 
+ *         until the application is done loading.
+ *      2. Loading gif will be enabled showing the user that stock analysis is running.
+ * 
+ * This function will fire when the button that starts 
+ * Stock Market Perdiction is pressed. 
+ * 
+ */
+let intialize_HTML_Elements = function () {
+    return new Promise(function (resolve, reject) {
+        try {
+            this.stock_market_perdiction_button.disabled = true;
+
+
+            this.loadingElement.style.display = 'block';
+            resolve();
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
 
 /**
  * 
@@ -61,7 +89,6 @@ window.addEventListener('DOMContentLoaded', function () {
  * 
  */
 let getStockData = function (url) {
-    loadingElement.style.display = 'block';
     return new Promise(function (resolve, reject) {
         var request = new XMLHttpRequest();
         request.open("GET", url, true);
@@ -453,132 +480,163 @@ let plot_stock_info = function (knn) {
             perdicted_values.push(data);
         }*/
         //console.log(original_data_train);
-        var myChart = new Chart(this.context, {
-            type: 'bar',
-            data: data = {
-                labels: knn.prepared_data.time,
-                datasets: [
-                    {
-                        type: 'line',
-                        label: "Close Info",
-                        fill: false,
-                        yAxisID: 'y-axis-a',
-                        lineTension: 0.1,
-                        backgroundColor: 'rgb(75, 214, 238)',
-                        borderColor: 'rgb(75, 214, 238)',
-                        borderCapStyle: 'butt',
-                        borderDash: [],
-                        borderDashOffset: 0.0,
-                        borderJoinStyle: 'miter',
-                        pointBorderColor: 'rgb(75, 214, 238)',
-                        pointBackgroundColor: 'rgb(75, 214, 238)',
-                        pointBorderWidth: 1,
-                        pointHoverRadius: 4,
-                        pointHoverBackgroundColor: 'rgb(75, 214, 238)',
-                        pointHoverBorderColor: 'rgb(75, 214, 238)',
-                        pointHoverBorderWidth: 3,
-                        pointRadius: 0.2,
-                        pointHitRadius: 10,
-                        data: knn.prepared_data.original_data,
-                    },
-                    /*{
-                        type: 'line',
-                        label: "Rolling Averages Predicted Values",
-                        fill: false,
-                        yAxisID: 'y-axis-a',
-                        lineTension: 0.1,
-                        backgroundColor: 'rgb(100, 250, 98)',
-                        borderColor: 'rgb(100, 250, 98)',
-                        borderCapStyle: 'butt',
-                        borderDash: [],
-                        borderDashOffset: 0.0,
-                        borderJoinStyle: 'miter',
-                        pointBorderColor: 'rgb(100, 250, 98)',
-                        pointBackgroundColor: 'rgb(100, 250, 98)',
-                        pointBorderWidth: 1,
-                        pointHoverRadius: 4,
-                        pointHoverBackgroundColor: 'rgb(100, 250, 98)',
-                        pointHoverBorderColor: 'rgb(100, 250, 98)',
-                        pointHoverBorderWidth: 3,
-                        pointRadius: 0.2,
-                        pointHitRadius: 10,
-                        data: perdicted_values,
-                    },*/
-                    {
-                        type: 'line',
-                        label: "Rolling Averages Actual Values",
-                        fill: false,
-                        yAxisID: 'y-axis-a',
-                        lineTension: 0.1,
-                        backgroundColor: 'rgb(78, 100, 200)',
-                        borderColor: 'rgb(78, 100, 200)',
-                        borderCapStyle: 'butt',
-                        borderDash: [],
-                        borderDashOffset: 0.0,
-                        borderJoinStyle: 'miter',
-                        pointBorderColor: 'rgb(78, 100, 200)',
-                        pointBackgroundColor: 'rgb(78, 100, 200)',
-                        pointBorderWidth: 1,
-                        pointHoverRadius: 4,
-                        pointHoverBackgroundColor: 'rgb(78, 100, 200)',
-                        pointHoverBorderColor: 'rgb(78, 100, 200)',
-                        pointHoverBorderWidth: 3,
-                        pointRadius: 0.2,
-                        pointHitRadius: 10,
-                        data: training_values,
-                    },
-                    {
-                        type: 'line',
-                        label: "Rolling Averages Actual Values",
-                        fill: false,
-                        yAxisID: 'y-axis-a',
-                        lineTension: 0.1,
-                        backgroundColor: 'rgb(210, 221, 72)',
-                        borderColor: 'rgb(210, 221, 72)',
-                        borderCapStyle: 'butt',
-                        borderDash: [],
-                        borderDashOffset: 0.0,
-                        borderJoinStyle: 'miter',
-                        pointBorderColor: 'rgb(210, 221, 72)',
-                        pointBackgroundColor: 'rgb(210, 221, 72)',
-                        pointBorderWidth: 1,
-                        pointHoverRadius: 4,
-                        pointHoverBackgroundColor: 'rgb(210, 221, 72)',
-                        pointHoverBorderColor: 'rgb(210, 221, 72)',
-                        pointHoverBorderWidth: 3,
-                        pointRadius: 0.2,
-                        pointHitRadius: 10,
-                        data: actual_values,
-                    }
-                ]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Share Price - Past 7 Days',
-                    fontSize: '20',
-                    fontFamily: 'Open Sans, sans-serif',
-                    // fontColor
-                    // fontStyle
-                    // padding
-                    // lineHeight
-                },
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            min: 0
-                        }
-                    }],
-                    yAxes: [{
-                        position: "left",
-                        id: "y-axis-a",
-                    }]
-                }
-            }
-        });
-
-        loadingElement.style.display = 'none';  
-
+        x = knn.prepared_data.time;
+        y = [knn.prepared_data.original_data,[], training_values, actual_values];
+        plot_data(x,y);
         resolve();
+    });
+};
+
+/**
+ * 
+ * This function will plot x and y data.
+ * 
+ * @param {Array} x     X values of the chart to be plotted 
+ * @param {Array} y     Y values of the Chart to be plotted
+ */
+let plot_data = function(x,y){
+    var myChart = new Chart(this.context, {
+        type: 'bar',
+        data: data = {
+            labels: x,
+            datasets: [
+                {
+                    type: 'line',
+                    label: "Close Info",
+                    fill: false,
+                    yAxisID: 'y-axis-a',
+                    lineTension: 0.1,
+                    backgroundColor: 'rgb(75, 214, 238)',
+                    borderColor: 'rgb(75, 214, 238)',
+                    borderCapStyle: 'butt',
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: 'miter',
+                    pointBorderColor: 'rgb(75, 214, 238)',
+                    pointBackgroundColor: 'rgb(75, 214, 238)',
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 4,
+                    pointHoverBackgroundColor: 'rgb(75, 214, 238)',
+                    pointHoverBorderColor: 'rgb(75, 214, 238)',
+                    pointHoverBorderWidth: 3,
+                    pointRadius: 0.2,
+                    pointHitRadius: 10,
+                    data: y[0],
+                },
+                {
+                    type: 'line',
+                    label: "Rolling Averages Predicted Values",
+                    fill: false,
+                    yAxisID: 'y-axis-a',
+                    lineTension: 0.1,
+                    backgroundColor: 'rgb(100, 250, 98)',
+                    borderColor: 'rgb(100, 250, 98)',
+                    borderCapStyle: 'butt',
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: 'miter',
+                    pointBorderColor: 'rgb(100, 250, 98)',
+                    pointBackgroundColor: 'rgb(100, 250, 98)',
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 4,
+                    pointHoverBackgroundColor: 'rgb(100, 250, 98)',
+                    pointHoverBorderColor: 'rgb(100, 250, 98)',
+                    pointHoverBorderWidth: 3,
+                    pointRadius: 0.2,
+                    pointHitRadius: 10,
+                    data: y[1],
+                },
+                {
+                    type: 'line',
+                    label: "Rolling Averages Actual Values",
+                    fill: false,
+                    yAxisID: 'y-axis-a',
+                    lineTension: 0.1,
+                    backgroundColor: 'rgb(78, 100, 200)',
+                    borderColor: 'rgb(78, 100, 200)',
+                    borderCapStyle: 'butt',
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: 'miter',
+                    pointBorderColor: 'rgb(78, 100, 200)',
+                    pointBackgroundColor: 'rgb(78, 100, 200)',
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 4,
+                    pointHoverBackgroundColor: 'rgb(78, 100, 200)',
+                    pointHoverBorderColor: 'rgb(78, 100, 200)',
+                    pointHoverBorderWidth: 3,
+                    pointRadius: 0.2,
+                    pointHitRadius: 10,
+                    data: y[2],
+                },
+                {
+                    type: 'line',
+                    label: "Rolling Averages Actual Values",
+                    fill: false,
+                    yAxisID: 'y-axis-a',
+                    lineTension: 0.1,
+                    backgroundColor: 'rgb(210, 221, 72)',
+                    borderColor: 'rgb(210, 221, 72)',
+                    borderCapStyle: 'butt',
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: 'miter',
+                    pointBorderColor: 'rgb(210, 221, 72)',
+                    pointBackgroundColor: 'rgb(210, 221, 72)',
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 4,
+                    pointHoverBackgroundColor: 'rgb(210, 221, 72)',
+                    pointHoverBorderColor: 'rgb(210, 221, 72)',
+                    pointHoverBorderWidth: 3,
+                    pointRadius: 0.2,
+                    pointHitRadius: 10,
+                    data: y[3],
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            title: {
+                display: true,
+                text: 'Stock Market Perdiction',
+                fontSize: '20',
+                fontFamily: 'Open Sans, sans-serif',
+            },
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        min: 0
+                    }
+                }],
+                yAxes: [{
+                    position: "left",
+                    id: "y-axis-a",
+                }]
+            }
+        }
+    });
+};
+
+/**
+ * 
+ * This function will intialize HTML elements:
+ *      1. The button that the user will press to start stock market perdiction
+ *         will be enabled so that the user can run the program again.
+ *      2. Loading gif will be displayed since the program finished.
+ * 
+ * This function will fire when stock market analysis is done.
+ * 
+ */
+let finalize_HTML_Elements = function () {
+    return new Promise(function (resolve, reject) {
+        try {
+            this.stock_market_perdiction_button.disabled = false;
+
+            this.loadingElement.style.display = 'none';
+            resolve();
+        } catch (error) {
+            reject(error);
+        }
     });
 };

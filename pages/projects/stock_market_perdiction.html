@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>My Website</title>
     <link rel="stylesheet" type="text/css" href="../../css/common_styles.css">
+    <link rel="stylesheet" type="text/css" href="../../css/stock_market_perdiction.css">
 </head>
 
 <body>
@@ -26,15 +27,23 @@
             </ul>
         </div>
     </header>
-    <div id="Introduction"><p>This application will pull https://www.alphavantage.co/ <br>
-    and plot stock market closing prices for Microsoft over the course of several years. <br>
-    A portion of the data will be used to train a RNN and another portion will be used to <br>
-    visually compare the output of the RNN.</p></div>
-    <div class="button"><button class="button" id="stock-market-perdiction-button">Stock Market Perdiction</button></div>
-    <div class="loading-message" id="loading-gif-container">
-            <img id = "loading-gif" src="../../img/loading.gif" alt="loading">
+    <div id="pre-graph-content">
+        <div class="Introduction">
+            <p>This application will pull https://www.alphavantage.co/ <br>
+                and plot stock market closing prices for Microsoft over the course of several years. <br>
+                A portion of the data will be used to train a RNN and another portion will be used to <br>
+                visually compare the output of the RNN.</p>
+        </div>
+        <div class="button">
+            <button class="button" id="stock-market-perdiction-button">Stock Market Perdiction</button>
+        </div>
+        <div class="loading-message" id="loading-gif-container">
+            <img id="loading-gif" src="../../img/loading.gif" alt="loading">
+        </div>
     </div>
-    <div id="stock-market-graph-content"><canvas class="canvas" id="stock-market-graph"></canvas></div>
+    <div id="stock-market-graph-content">
+        <canvas class="canvas" id="stock-market-graph"></canvas>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
     <script src="../../script/Stock_Market_perdictions/stock_market_perdiction.js"></script>
