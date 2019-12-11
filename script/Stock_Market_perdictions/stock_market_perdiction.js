@@ -1,5 +1,14 @@
 window.addEventListener('DOMContentLoaded', function () {
 
+    document.getElementById("loading-gif-container").style.display = "none";
+    stock_market_perdiction = document.getElementById("stock-market-perdiction-button");
+
+    this.canvas = document.getElementById("stock-market-graph");
+    this.context = canvas.getContext('2d');
+
+    this.canvas.width = 500;
+    this.canvas.height = 200;
+
     time_series = "function=TIME_SERIES_DAILY";
     symbol = "symbol=MSFT";
     outputsize = "outputsize=full";
@@ -8,31 +17,36 @@ window.addEventListener('DOMContentLoaded', function () {
     // https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&outputsize=full&apikey=demo
     url = "https://www.alphavantage.co/query?" + time_series + "&" + symbol + "&" + outputsize + "&" + apikey;
 
-    getStockData(url)
-        .then(responseText =>
-            parseStockData(responseText)
-        )
-        .then(stock_info =>
-            data_cleaning(stock_info)
-        )
-        .then(stock_info =>
-            prep_data(stock_info)
-        )
-        .then(stock_info =>
-            build_rnn(stock_info)
-        )
-        /*.then(rnn =>
-            train_rnn(rnn)
-        )
-        .then(rnn =>
-            perdict_rnn(rnn)
-        )*/
-        .then(stock_info =>
-            plot_stock_info(stock_info)
-        )
-        .catch(error => {
-            alert("Oops Something Went Wrong!" + error)
-        });
+    stock_market_perdiction.addEventListener("click", function () {
+        document.getElementById("loading-gif-container").style.display = "block";
+        getStockData(url)
+            .then(responseText =>
+                parseStockData(responseText)
+            )
+            .then(stock_info =>
+                data_cleaning(stock_info)
+            )
+            .then(stock_info =>
+                prep_data(stock_info)
+            )
+            .then(stock_info =>
+                build_rnn(stock_info)
+            )
+            /*.then(rnn =>
+                train_rnn(rnn)
+            )
+            .then(rnn =>
+                perdict_rnn(rnn)
+            )*/
+            .then(stock_info =>
+                plot_stock_info(stock_info)
+            )
+            .catch(error => {
+                alert("Oops Something Went Wrong!" + error)
+            });
+        setTimeout(function () {}, 5000);
+        document.getElementById("loading-gif-container").style.display = "none";
+    });
 });
 
 /**
@@ -399,29 +413,46 @@ let plot_stock_info = function (knn) {
     return new Promise(function (resolve, reject) {
 
 
-        var canvas = document.getElementById("open_stock_info");
-        var context = canvas.getContext('2d');
-    
+        //var canvas = document.getElementById("open_stock_info");
+        //var context = canvas.getContext('2d');
 
-        actual_values = [];
-        for(i = 0; i < prepared_data.T_test.length; i++){
+        max = Math.max(...knn.prepared_data.original_data);
+        min = Math.min(...knn.prepared_data.original_data);
+        Y_train_denormalized = knn.prepared_data.Y_train.map(function (x) {
+            return x * (max - min) + min;
+        });
+        Y_test_denormalized = knn.prepared_data.Y_test.map(function (x) {
+            return x * (max - min) + min;
+        });
+
+
+        training_values = [];
+        for (i = 0; i < knn.prepared_data.T_train.length; i++) {
             data = {};
             data.x = knn.prepared_data.T_train[i];
-            data.y = knn.prepared_data.Original_data_train[i];
+            data.y = Y_train_denormalized[i];
+            training_values.push(data);
+        }
+
+        actual_values = [];
+        for (i = 0; i < knn.prepared_data.T_test.length; i++) {
+            data = {};
+            data.x = knn.prepared_data.T_test[i];
+            data.y = Y_test_denormalized[i];
             actual_values.push(data);
         }
-        perdicted_values = [];
+        /*perdicted_values = [];
         for (i = 0; i < knn.prepared_data.T_test.length; i++) {
             data = {};
             data.x = knn.prepared_data.T_test[i];
             data.y = knn.prepared_data.Y_pred[i];
             perdicted_values.push(data);
-        }
+        }*/
         //console.log(original_data_train);
-        var myChart = new Chart(context, {
+        var myChart = new Chart(this.context, {
             type: 'bar',
             data: data = {
-                labels: prepared_data.time,
+                labels: knn.prepared_data.time,
                 datasets: [
                     {
                         type: 'line',
@@ -446,9 +477,9 @@ let plot_stock_info = function (knn) {
                         pointHitRadius: 10,
                         data: knn.prepared_data.original_data,
                     },
-                    {
+                    /*{
                         type: 'line',
-                        label: "Rolling Averages Actual Values",
+                        label: "Rolling Averages Predicted Values",
                         fill: false,
                         yAxisID: 'y-axis-a',
                         lineTension: 0.1,
@@ -468,6 +499,29 @@ let plot_stock_info = function (knn) {
                         pointRadius: 0.2,
                         pointHitRadius: 10,
                         data: perdicted_values,
+                    },*/
+                    {
+                        type: 'line',
+                        label: "Rolling Averages Actual Values",
+                        fill: false,
+                        yAxisID: 'y-axis-a',
+                        lineTension: 0.1,
+                        backgroundColor: 'rgb(78, 100, 200)',
+                        borderColor: 'rgb(78, 100, 200)',
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: 'rgb(78, 100, 200)',
+                        pointBackgroundColor: 'rgb(78, 100, 200)',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: 'rgb(78, 100, 200)',
+                        pointHoverBorderColor: 'rgb(78, 100, 200)',
+                        pointHoverBorderWidth: 3,
+                        pointRadius: 0.2,
+                        pointHitRadius: 10,
+                        data: training_values,
                     },
                     {
                         type: 'line',
