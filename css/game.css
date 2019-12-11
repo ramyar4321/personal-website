@@ -3,7 +3,9 @@
     flex-direction: column;
     justify-content: center;
     text-align: center;
-    margin: 100px 0px;
+    margin: 0px;
+    height: 600px;
+    background-color: orangered;
 }
 
 #timer {

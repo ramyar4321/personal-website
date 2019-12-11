@@ -1,0 +1,31 @@
+#pre-graph-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    float: left;
+    flex-direction: column;
+    background-color: blue;
+    padding: 0;
+    height: 200px;
+}
+
+#loading-gif-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto 0px;
+}
+
+#loading-gif-container img{
+    width: 70px;
+    height: 70px;
+    position: absolute;
+}
+
+#stock-market-graph-content{
+    height: 500px;
+}
+
+.class{
+    height: 500px;
+}
