@@ -1,7 +1,9 @@
 window.addEventListener('DOMContentLoaded', function () {
 
-    document.getElementById("loading-gif-container").style.display = "none";
-    stock_market_perdiction = document.getElementById("stock-market-perdiction-button");
+    var stock_market_perdiction = document.getElementById("stock-market-perdiction-button");
+
+    this.loadingElement = document.getElementById("loading-gif");
+    loadingElement.style.display = 'none'; 
 
     this.canvas = document.getElementById("stock-market-graph");
     this.context = canvas.getContext('2d');
@@ -18,7 +20,7 @@ window.addEventListener('DOMContentLoaded', function () {
     url = "https://www.alphavantage.co/query?" + time_series + "&" + symbol + "&" + outputsize + "&" + apikey;
 
     stock_market_perdiction.addEventListener("click", function () {
-        document.getElementById("loading-gif-container").style.display = "block";
+        //loadingElement.appendChild(loading);   
         getStockData(url)
             .then(responseText =>
                 parseStockData(responseText)
@@ -45,7 +47,8 @@ window.addEventListener('DOMContentLoaded', function () {
                 alert("Oops Something Went Wrong!" + error)
             });
         setTimeout(function () {}, 5000);
-        document.getElementById("loading-gif-container").style.display = "none";
+        //loadingElement.removeChild(loading.lastChild);
+        //loadingElement.style.display = 'none';
     });
 });
 
@@ -58,6 +61,7 @@ window.addEventListener('DOMContentLoaded', function () {
  * 
  */
 let getStockData = function (url) {
+    loadingElement.style.display = 'block';
     return new Promise(function (resolve, reject) {
         var request = new XMLHttpRequest();
         request.open("GET", url, true);
@@ -573,6 +577,7 @@ let plot_stock_info = function (knn) {
             }
         });
 
+        loadingElement.style.display = 'none';  
 
         resolve();
     });
