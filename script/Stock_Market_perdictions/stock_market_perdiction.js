@@ -1,5 +1,6 @@
 window.addEventListener('DOMContentLoaded', function () {
 
+    // Get DOM elements
     this.stock_market_perdiction_button = document.getElementById("stock-market-perdiction-button");
 
     this.loadingElement = document.getElementById("loading-gif");
@@ -8,8 +9,10 @@ window.addEventListener('DOMContentLoaded', function () {
     this.canvas = document.getElementById("stock-market-graph");
     this.context = canvas.getContext('2d');
 
+    // Plot an empty chart
     plot_data([],[]);
 
+    // Get the URL that will be used to retreive data
     time_series = "function=TIME_SERIES_DAILY";
     symbol = "symbol=MSFT";
     outputsize = "outputsize=full";
@@ -18,11 +21,13 @@ window.addEventListener('DOMContentLoaded', function () {
     // https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&outputsize=full&apikey=demo
     url = "https://www.alphavantage.co/query?" + time_series + "&" + symbol + "&" + outputsize + "&" + apikey;
 
+
+    // Run the algorithm
     stock_market_perdiction_button.addEventListener("click", function () {
 
         intialize_HTML_Elements()
             .then(() =>
-                getStockData(url)
+                getStockData(url) 
             )
             .then(responseText =>
                 parseStockData(responseText)
@@ -36,12 +41,12 @@ window.addEventListener('DOMContentLoaded', function () {
             .then(stock_info =>
                 build_rnn(stock_info)
             )
-            /*.then(rnn =>
+            .then(rnn =>
                 train_rnn(rnn)
             )
             .then(rnn =>
                 perdict_rnn(rnn)
-            )*/
+            )
             .then(stock_info =>
                 plot_stock_info(stock_info)
             )
@@ -108,7 +113,13 @@ let getStockData = function (url) {
     });
 };
 
-
+/**
+ * 
+ * This function will extract stock market ifnormation from the JSON
+ * daat returned by the Alpha Vanatage API.
+ * 
+ * @param {JSON Object} jsonData 
+ */
 let parseStockData = function (jsonData) {
     return new Promise(function (resolve, reject) {
         try {
@@ -146,7 +157,6 @@ let parseStockData = function (jsonData) {
             volume_info: volume
         }
 
-        //console.log(stock_info);
         resolve(stock_info);
     });
 };
@@ -194,18 +204,13 @@ let data_cleaning = function (stock_info) {
 /**
  * 
  * This function will promise to prepare the data to be used in ML.
- * It will do the following:
- *      1. Decrease the size of the dataset to 3000 datapoints 
- *      2. Convert strings to floating values for a given stock data field.
- *      3. Normalize the closing and rolling average data
- *      4. Compute the rolling averages for stock data field, in this case closing data
- *      5. Split the data into training and test data
- * Resolve will return closing, rolling averages, and time data.
- * @param {Object} data 
+ * 
+ * @param {Object} data Stock Data
  */
 let prep_data = function (stock_data) {
 
     return new Promise(function (resolve, reject) {
+        // Decrease the size of the dataset to 3000 datapoints 
         slice_start_position = 3000;
         if (slice_start_position < stock_data.close_info.length) {
             stock_data.close_info = stock_data.close_info.slice(0, slice_start_position);
@@ -214,11 +219,12 @@ let prep_data = function (stock_data) {
             reject("Dataset contains less than 3000 data points.");
         }
 
+        // Convert strings to floating values for a given stock data field.
         stock_data.close_info = stock_data.close_info.map(close_info => {
             return parseFloat(close_info)
         });
 
-
+        //  Normalize the closing and rolling average data
         max = Math.max(...stock_info.close_info);
         min = Math.min(...stock_info.close_info);
         if (max - min == 0) {
@@ -234,9 +240,8 @@ let prep_data = function (stock_data) {
         }
 
 
-
+        // Compute the rolling averages for stock data field, in this case closing data
         window_size = 50;
-        //console.log( close_info_normalized.length % window_size);
         if (close_info_normalized.length % window_size != 0) {
             reject("Window size of 50 is not divisble number of data points");
         }
@@ -257,6 +262,7 @@ let prep_data = function (stock_data) {
             X.push(x_window);
         }
 
+        // Split the data into training and test data
         training_size = 70;
         X_train = X.slice(0, Math.floor(training_size / 100 * X.length));
         X_test = X.slice(Math.floor(training_size / 100 * X.length), X.length);
@@ -271,22 +277,15 @@ let prep_data = function (stock_data) {
 
 
         prepared_data = {
-            original_data: stock_info.close_info,
-            Original_data_train: Original_data_train,
-            Original_data_test: Original_data_test,
-            X: X,
-            Y: Y,
-            X_train: X_train,
-            Y_train: Y_train,
-            X_test: X_test,
-            Y_test: Y_test,
-            T_train: T_train,
-            T_test: T_test,
-            window_size: window_size,
-            train_size: train_size,
-            test_size: test_size,
-            //normalized_data: close_info_normalized,
-            time: stock_info.time_info,
+            original_data: stock_info.close_info, // Will be used to plot the closing prices.
+            X_train: X_train, // Will be used to train the model.
+            Y_train: Y_train, // Will be used to train the model.
+            X_test: X_test, // Will be used to perdict values
+            Y_test: Y_test, // Will be used to plot actual values and compare it visually with perdict values
+            T_train: T_train, // Will be used to plot training data
+            T_test: T_test, // Will be used to plot actual and perdicted values
+            window_size: window_size, // Will be used to build Neural Network
+            time: stock_info.time_info, // Will be used to plot the closing prices.
 
         };
 
@@ -298,6 +297,8 @@ let prep_data = function (stock_data) {
 /**
  * 
  * This function will build the RNN model.
+ * 
+ * Source: https://www.codeproject.com/Articles/1265477/TensorFlow-js-Predicting-Time-Series-Using-Recurre
  * 
  * @param {Object} prepared_data Data
  */
@@ -373,10 +374,7 @@ let train_rnn = function (rnn) {
     return new Promise(async (resolve, reject) => {
 
         try {
-            shouldLoad = 0;
-            if (shouldLoad == 1) {
-                rnn.model = await tf.loadLayersModel('localstorage://my-model');
-            } else {
+           
                 let X = rnn.prepared_data.X_train
                 let Y = rnn.prepared_data.Y_train;
 
@@ -388,13 +386,11 @@ let train_rnn = function (rnn) {
                     xs,
                     ys, {
                     batchSize: rnn.prepared_data.window_size,
-                    epochs: 30
+                    //epochs: 30
+                    epochs: 5
                 })
 
-                rnn.hist = history;
-
-                //await rnn.model.save('localstorage://my-model');
-            }
+                rnn.hist = history;            
 
             //console.log(rnn);
             resolve(rnn);
@@ -472,16 +468,15 @@ let plot_stock_info = function (knn) {
             data.y = Y_test_denormalized[i];
             actual_values.push(data);
         }
-        /*perdicted_values = [];
+        perdicted_values = [];
         for (i = 0; i < knn.prepared_data.T_test.length; i++) {
             data = {};
             data.x = knn.prepared_data.T_test[i];
             data.y = knn.prepared_data.Y_pred[i];
             perdicted_values.push(data);
-        }*/
-        //console.log(original_data_train);
+        }
         x = knn.prepared_data.time;
-        y = [knn.prepared_data.original_data,[], training_values, actual_values];
+        y = [knn.prepared_data.original_data,perdicted_values, training_values, actual_values];
         plot_data(x,y);
         resolve();
     });
