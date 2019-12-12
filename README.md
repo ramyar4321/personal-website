@@ -46,7 +46,7 @@ Description: The program does the following:
 
 Further improvements:
 1. The RNN perdiction returns the same value for any input.
-    This maybe due to choosing wrong hyper-parameters. This needs to be fixed.
+    This maybe due to choosing wrong hyper-parameters. This needs to be fixed. Its been almost 2 years since my ML course so I am a bit rusty.
 2. Potentially, use Convoluted Neural Network.
 
 ## Contact info
