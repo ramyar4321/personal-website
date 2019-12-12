@@ -4,6 +4,8 @@ Hello and welcome. Here you will find the code used to build my personal website
 
 The main purpose of this project was to teach myself HTML, CSS, and Javascript, and to apply what I have learned into making a simple website. 
 
+The website can be accessed [here](https://ramyar4321.github.io/personal-website/).
+
 In my website you will find the following:
 
 ## About Me Page ##
