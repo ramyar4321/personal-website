@@ -27,7 +27,8 @@ header {
 .nav ul li {
     float: left;
     /*margin: 0px 40px;*/
-    padding: 25px;
+    padding: 16px 20px;
+    margin-bottom: 0px;
 }
 
 .nav ul li ul {
