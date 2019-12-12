@@ -40,7 +40,7 @@ Description: The program does the following:
     3. Create Reccurent Neural Netwrok and train it with the train set.
     4. Used the trained RNN model and run it against the test set.
     5. Plot the data for viualization.
-    6. It may take a few minutes for the plot to load. Here are the results for the sake of saving your time: ![](img\stock_market_perdiction.JPG)
+    6. It may take a few minutes for the plot to load. Here are the results for the sake of saving your time: ![](/img/stock_market_perdiction.JPG)
 
 Further improvements:
     1. The RNN perdiction returns the same value for any input.
