@@ -36,6 +36,8 @@ Further improvements:
 
 ### Stock Market Perdiction ###
 
+Source: https://www.codeproject.com/Articles/1265477/TensorFlow-js-Predicting-Time-Series-Using-Recurre
+
 Description: The program does the following:
 1. Collect stock data from API
 2. Clean the data and split it into train and test sets
