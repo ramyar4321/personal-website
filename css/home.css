@@ -1,27 +1,41 @@
-.welcome, .contact {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-}
-
-.welcome {
-    flex-direction: column;
-    background-image: url("../img/20160709_101536.jpg");
-    background-size: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
+body {
+    background-color: black;
+    margin: 0;
     padding: 0;
-    height: 535px;
 }
 
-.welcome h1 {
-    font-size: 70px;
-    color: white;
+.Container {
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
 }
 
-.welcome p {
-    width: 600px;
-    font-size: 20px;
-    color: white;
+.Container .Slider{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 400%;
+    height: 75%;
+    float: left;
+}
+
+.Container .Slider .Slide{
+    width: 25%;
+    height: 100%;
+    float: left;
+    background-color: blue;
+}
+
+.Container .Slider .Slide .Navigation-Dot{
+    height: 1px;
+    width: 1px;
+    background-color: rgb(233, 223, 223);
+    border-radius: 50%;
+    display: inline-block;
+
+    position: absolute;
+    bottom: 20px;
+    left: 10px;
+    right: 10px;
+    padding: 10px;
 }
