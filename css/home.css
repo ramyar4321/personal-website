@@ -54,5 +54,10 @@ body {
 .button{
     font-size: 15px;
     background-color: Transparent;
-    padding: 30px 90px;
+    width: 10vw;
+    transition: transform .2s;
+}
+
+.button:hover{
+    transform: scale(1.5);
 }
