@@ -7,64 +7,6 @@ body {
     flex-direction: column;
 }
 
-header {
-    background:black;
-    color: white;
-    height: 50px;
-    /*padding: 5px;*/
-    display: flex;
-    justify-content: left;
-    align-items: center;
-}
-
-
-.nav ul {
-    margin: 0px;
-    padding: 0px;
-    list-style: none;
-}
-
-.nav ul li {
-    float: left;
-    /*margin: 0px 40px;*/
-    padding: 16px 20px;
-    margin-bottom: 0px;
-}
-
-.nav ul li ul {
-    position: absolute;
-    margin: 15px -20px;
-}
-
-.nav ul li ul li {
-    /*padding: 0px;*/
-    float: none;
-    display: none;
-    /*margin: 5px 0px;*/
-    padding: 15px 0px;
-}
-
-.nav ul li:hover{
-    background-color: Green;
-}
-
-.nav ul li:hover ul{
-    background-color: black;
-}
-
-.nav ul li:hover ul li {
-    display: block;
-    /*position: absolute;*/
-}
-
-
-header a {
-    text-decoration: none;
-}
-
-header a:hover {
-    text-decoration: underline;
-}
 
 .contact {
     /*margin: auto 0;*/
