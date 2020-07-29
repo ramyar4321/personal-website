@@ -9,7 +9,7 @@ body {
 
 
 .header-container {
-    height: 65vh;
+    height: 100vh;
     position: relative;
     display: flex;
     justify-content: center;
@@ -45,11 +45,14 @@ body {
 }
 
 .button-container{
+    width: 80vw;
     display: flex;
     justify-content: space-between;
     margin-top: 100px;
 }
 
 .button{
-    padding: 50px 70px;
+    font-size: 15px;
+    background-color: Transparent;
+    padding: 30px 90px;
 }
