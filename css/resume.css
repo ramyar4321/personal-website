@@ -1,4 +1,4 @@
-.head, .education, .awards-acheivements, .skills,
+.head, .education,
 .projects, .work-experience {
     width: 50%;
     margin-left: auto;
@@ -19,24 +19,6 @@
 
 p{
     clear:both;
-}
-
-.bold {
-    font-weight: bold;
-}
-
-
-
-
-.head, .education, .awards-acheivements, .skills, .projects,
-.work-experience, .wurzburg, .cancer {
-    margin-bottom: 10px;
-}
-
-.education, .awards-acheivements, .skills, .projects,
-.work-experience, .wurzburg, .cancer {
-    display: flex;
-    flex-direction: column;
 }
 
 
@@ -64,40 +46,5 @@ p{
     margin-bottom: 0px;
 }
 
-.education-diploma p {
-    margin-left: 82px;
-}
-
-.awards-acheivements-content ul li {
-    list-style-type: none;
-}
-
-.awards-acheivements-content {
-    padding-top: 0px;
-}
-
-.awards-acheivements-content ul, .skills-list ul {
-    display: inline-block;
-    *display: inline;
-    margin-top: 0px;
-}
-
-.awards-acheivements-content ul {
-    padding-left: 0px;
-    padding-right: 42px;
-}
 
 
-
-.work-experience-title h2{
-    margin-top: 0px;
-}
-
-
-.left {
-    float: left;
-}
-
-.right {
-    float: right;
-}
