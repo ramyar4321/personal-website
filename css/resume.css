@@ -5,37 +5,61 @@
     margin-right: auto;
 }
 
-.head {
+.head .title{
     text-align: center;
+}
+
+.left-align{
+    float:left;
+}
+
+.right-align{
+    float:right;
+}
+
+p{
+    clear:both;
 }
 
 .bold {
     font-weight: bold;
 }
 
-.awards-acheivements-content ul li {
-    list-style-type: none;
+
+
+
+.head, .education, .awards-acheivements, .skills, .projects,
+.work-experience, .wurzburg, .cancer {
+    margin-bottom: 10px;
 }
 
 .education, .awards-acheivements, .skills, .projects,
 .work-experience, .wurzburg, .cancer {
     display: flex;
     flex-direction: column;
-    margin-bottom: 40px;
 }
 
 
-.education-title, .education-detail {
-    text-align: left;
+.education-detail, .work-experience-detail {
+    display: flex;
+    justify-content: space-between;
 }
 
-.education-title, .awards-acheivements-title, .skills,
-.projects, .work-experience-title {
-    border-top: 1px solid;
+.education-detail p, .work-experience-detail p{
+    font-weight: bold;
 }
 
-.education-title h2, .education-detail p, .education-diploma p,
-.awards-acheivements-title h2, .skills h2, .projects h2{
+.education-content ul li, .work-experience-content ul li,
+.wurzburg-project-content ul li, .personal-project-content ul li{
+    margin-bottom: 5px;
+}
+
+.education-title, .work-experience-title, .projects-title {
+    border-bottom: 3px solid;
+}
+
+.education-title h4, .education-detail p, .work-experience-title h4,
+.work-experience p, .projects-title h4, .wurzburg-project-title h4{
     margin-top: 0px;
     margin-bottom: 0px;
 }
@@ -44,6 +68,9 @@
     margin-left: 82px;
 }
 
+.awards-acheivements-content ul li {
+    list-style-type: none;
+}
 
 .awards-acheivements-content {
     padding-top: 0px;
