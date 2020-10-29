@@ -21,6 +21,10 @@ p{
     clear:both;
 }
 
+.head, .education, .projects,
+.work-experience {
+    margin-bottom: 10px;
+}
 
 .education-detail, .work-experience-detail {
     display: flex;
